@@ -1,0 +1,27 @@
+<idea-plugin version="2">
+	<name>Nette framework helpers</name>
+	<description>Nette development with pleasure</description>
+	<version>0.1</version>
+	<vendor>juzna.cz</vendor>
+
+	<idea-version since-build="107.105"/>
+	<depends>com.intellij.modules.lang</depends>
+	<depends>com.jetbrains.php</depends>
+
+	<application-components>
+		<!-- Add your application components here -->
+	</application-components>
+
+	<project-components>
+		<!-- Add your project components here -->
+	</project-components>
+
+	<actions>
+		<!-- Add your actions here -->
+	</actions>
+
+	<extensions defaultExtensionNs="com.intellij">
+		<php.typeProvider implementation="nette.NetteObjectFieldsTypeProvider"/>
+		<completion.contributor language="PHP" implementationClass="nette.NetteObjectFieldsCompletionContributor"/>
+	</extensions>
+</idea-plugin>
