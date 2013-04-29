@@ -1,0 +1,1 @@
+# Nette support in PhpStorm
