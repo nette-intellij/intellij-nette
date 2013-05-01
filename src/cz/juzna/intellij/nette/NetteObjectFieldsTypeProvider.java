@@ -7,11 +7,12 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.FieldReference;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider;
 
 /**
  *
  */
-public class NetteObjectFieldsTypeProvider implements com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider {
+public class NetteObjectFieldsTypeProvider implements PhpTypeProvider {
 	@Override
 	public PhpType getType(PsiElement e) {
 		if (DumbService.getInstance(e.getProject()).isDumb()) return null;
