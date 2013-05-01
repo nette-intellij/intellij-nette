@@ -21,7 +21,7 @@
 	</actions>
 
 	<extensions defaultExtensionNs="com.intellij">
-		<php.typeProvider implementation="nette.NetteObjectFieldsTypeProvider"/>
-		<completion.contributor language="PHP" implementationClass="nette.NetteObjectFieldsCompletionContributor"/>
+		<php.typeProvider implementation="cz.juzna.intellij.nette.NetteObjectFieldsTypeProvider"/>
+		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.NetteObjectFieldsCompletionContributor"/>
 	</extensions>
 </idea-plugin>

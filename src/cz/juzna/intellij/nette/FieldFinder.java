@@ -1,4 +1,4 @@
-package nette;
+package cz.juzna.intellij.nette;
 
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;

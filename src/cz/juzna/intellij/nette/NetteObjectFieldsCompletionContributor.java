@@ -1,4 +1,4 @@
-package nette;
+package cz.juzna.intellij.nette;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.patterns.PlatformPatterns;
@@ -10,7 +10,6 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.MemberReference;
 import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
 import org.jetbrains.annotations.NotNull;

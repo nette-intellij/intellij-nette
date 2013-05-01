@@ -1,4 +1,4 @@
-package nette;
+package cz.juzna.intellij.nette;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.psi.PsiElement;
