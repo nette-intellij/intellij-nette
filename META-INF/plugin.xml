@@ -9,7 +9,12 @@
 	<depends>com.jetbrains.php</depends>
 
 	<extensions defaultExtensionNs="com.intellij">
+		<!-- Nette -->
 		<php.typeProvider implementation="cz.juzna.intellij.nette.NetteObjectFieldsTypeProvider"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.NetteObjectFieldsCompletionContributor"/>
+
+		<!-- Pd -->
+		<php.typeProvider implementation="cz.juzna.intellij.pd.PdEntityFieldsTypeProvider"/>
+		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.pd.PdEntityFieldsCompletionContributor"/>
 	</extensions>
 </idea-plugin>
