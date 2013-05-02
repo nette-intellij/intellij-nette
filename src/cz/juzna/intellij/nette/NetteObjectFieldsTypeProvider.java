@@ -9,6 +9,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider;
 
+import java.util.Collection;
+
 /**
  *
  */
@@ -16,12 +18,13 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider {
 	@Override
 	public PhpType getType(PsiElement e) {
 		if (DumbService.getInstance(e.getProject()).isDumb()) return null;
+
 		if (e instanceof FieldReference) {
 			FieldReference field = (FieldReference) e;
-			HashMap<String, Method> fields = FieldFinder.findMagicFields(field.getClassReference().getType(), PhpIndex.getInstance(e.getProject()));
+			HashMap<String, Collection<Method>> fields = FieldFinder.findMagicFields(field.getClassReference().getType(), PhpIndex.getInstance(e.getProject()));
+
 			if (fields.containsKey(field.getName())) {
-				PhpType type = fields.get(field.getName()).getType();
-				return type;
+				return MagicFieldsTypesHelper.extractTypeFromMethodTypes(fields.get(field.getName()));
 			}
 		}
 

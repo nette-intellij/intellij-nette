@@ -8,13 +8,13 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class FieldFinder {
-
 	@NotNull
-	public static HashMap<String, Method> findMagicFields(PhpType type, PhpIndex phpIndex) {
-		HashMap<String, Method> fields = new HashMap<String, Method>();
+	public static HashMap<String, Collection<Method>> findMagicFields(PhpType type, PhpIndex phpIndex) {
+		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
 
 		for (String fqn : type.getTypes()) {
 			Collection<PhpClass> classes = phpIndex.getClassesByFQN(fqn);
@@ -22,10 +22,27 @@ public class FieldFinder {
 				if (it == null) continue; // for sure, dunno why actually
 				for (Method method : it.getMethods()) {
 					String name = method.getName();
-					if ( ! name.startsWith("get")) continue;
 
-					String fieldName = lcfirst(name.substring(3));
-					fields.put(fieldName, method);
+					String fieldName;
+
+					if (name.startsWith("get") && name.length() > 3) {
+						fieldName = lcfirst(name.substring(3));
+					} else if (name.startsWith("is") && name.length() > 2) {
+						fieldName = lcfirst(name.substring(2));
+					} else if (name.startsWith("set") && name.length() > 3 && method.getParameters().length == 1) {
+						fieldName = lcfirst(name.substring(3));
+					} else {
+						continue;
+					}
+
+					Collection fieldMethods = fields.get(fieldName);
+
+					if (fieldMethods == null) {
+						fieldMethods = new ArrayList();
+						fields.put(fieldName, fieldMethods);
+					}
+
+					fieldMethods.add(method);
 				}
 			}
 		}
@@ -58,6 +75,16 @@ public class FieldFinder {
 	}
 
 	private static String lcfirst(String string) {
-		return Character.toLowerCase(string.charAt(0)) + (string.length() > 1 ? string.substring(1) : "");
+		StringBuilder s = new StringBuilder();
+
+		if (string.length() > 0) {
+			s.append(Character.toLowerCase(string.charAt(0)));
+		}
+
+		if (string.length() > 1) {
+			s.append(string.substring(1));
+		}
+
+		return s.toString();
 	}
 }

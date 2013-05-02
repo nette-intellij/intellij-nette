@@ -13,10 +13,12 @@ import com.jetbrains.php.completion.insert.PhpFunctionInsertHandler;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.MemberReference;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpExpression;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -46,23 +48,33 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 				return;
 			}
 
-			PhpType type = ((MemberReference) position).getClassReference().getType();
+			MemberReference classRef = (MemberReference) position;
+			PhpExpression classExpr = classRef.getClassReference();
+			PhpType type = classExpr.getType();
 			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
 
 			if (!nObjectType.isConvertibleFrom(type, phpIndex)) {
 				return;
 			}
 
-			HashMap<String, Method> magicFields = FieldFinder.findMagicFields(type, phpIndex);
+			HashMap<String, Collection<Method>> fields = FieldFinder.findMagicFields(type, phpIndex);
 
 			// build lookup list
-			for (String fieldName : magicFields.keySet()) {
-				Method method = magicFields.get(fieldName);
-
+			for (String fieldName : fields.keySet()) {
 				PhpLookupElement item = new PhpLookupElement(fieldName, PhpFieldIndex.KEY, position.getProject(), null);
-//					item.lookupString = "$" + item.lookupString;
-				item.typeText = method.getType().toString();
-				item.icon = PhpIcons.FIELD;
+
+//				item.lookupString = "$" + item.lookupString;
+
+				PhpType fieldType = MagicFieldsTypesHelper.extractTypeFromMethodTypes(fields.get(fieldName));
+
+				if (fieldType != null) {
+					item.typeText = fieldType.toStringRelativized(classRef.getNamespaceName());
+				}
+
+				RowIcon icon = new RowIcon(2);
+				icon.setIcon(PhpIcons.FIELD, 0);
+				icon.setIcon(PhpIcons.PUBLIC, 1);
+				item.icon = icon;
 
 				results.addElement(item);
 			}
