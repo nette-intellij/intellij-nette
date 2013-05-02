@@ -62,7 +62,11 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 				PhpLookupElement item = new PhpLookupElement(fieldName, PhpFieldIndex.KEY, position.getProject(), null);
 //					item.lookupString = "$" + item.lookupString;
 				item.typeText = method.getType().toString();
-				item.icon = PhpIcons.FIELD;
+
+				RowIcon icon = new RowIcon(2);
+				icon.setIcon(PhpIcons.FIELD, 0);
+				icon.setIcon(PhpIcons.PUBLIC, 1);
+				item.icon = icon;
 
 				results.addElement(item);
 			}
