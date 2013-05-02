@@ -35,10 +35,10 @@ public class FieldFinder {
 						continue;
 					}
 
-					Collection fieldMethods = fields.get(fieldName);
+					Collection<Method> fieldMethods = fields.get(fieldName);
 
 					if (fieldMethods == null) {
-						fieldMethods = new ArrayList();
+						fieldMethods = new ArrayList<Method>();
 						fields.put(fieldName, fieldMethods);
 					}
 
