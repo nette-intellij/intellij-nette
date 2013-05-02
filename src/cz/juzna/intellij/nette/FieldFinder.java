@@ -58,6 +58,16 @@ public class FieldFinder {
 	}
 
 	private static String lcfirst(String string) {
-		return Character.toLowerCase(string.charAt(0)) + (string.length() > 1 ? string.substring(1) : "");
+		StringBuilder s = new StringBuilder();
+
+		if (string.length() > 0) {
+			s.append(Character.toLowerCase(string.charAt(0)));
+		}
+
+		if (string.length() > 1) {
+			s.append(string.substring(1));
+		}
+
+		return s.toString();
 	}
 }
