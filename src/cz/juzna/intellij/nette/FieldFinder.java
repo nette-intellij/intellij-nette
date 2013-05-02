@@ -2,14 +2,17 @@ package cz.juzna.intellij.nette;
 
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 public class FieldFinder {
 
+	@NotNull
 	public static HashMap<String, Method> findMagicFields(PhpType type, PhpIndex phpIndex) {
 		HashMap<String, Method> fields = new HashMap<String, Method>();
 
@@ -26,6 +29,31 @@ public class FieldFinder {
 				}
 			}
 		}
+		return fields;
+	}
+
+	@NotNull
+	public static HashMap<String, Field> findEventFields(PhpType type, PhpIndex phpIndex) {
+		HashMap<String, Field> fields = new HashMap<String, Field>();
+
+		for (String fqn : type.getTypes()) {
+			Collection<PhpClass> classes = phpIndex.getClassesByFQN(fqn);
+			for (PhpClass it : classes) {
+				if (it == null) {
+					continue;
+				}
+
+				for (Field field : it.getFields()) {
+					String name = field.getName();
+					if (name.length() <= 2 || !name.startsWith("on")) { // we want only "onEvent"
+						continue;
+					}
+
+					fields.put(name, field);
+				}
+			}
+		}
+
 		return fields;
 	}
 
