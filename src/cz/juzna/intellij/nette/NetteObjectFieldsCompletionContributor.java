@@ -1,6 +1,8 @@
 package cz.juzna.intellij.nette;
 
 import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
@@ -9,21 +11,18 @@ import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.completion.PhpLookupElement;
-import com.jetbrains.php.completion.insert.PhpFunctionInsertHandler;
-import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.MemberReference;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpExpression;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-/**
- *
- */
+
 public class NetteObjectFieldsCompletionContributor extends CompletionContributor {
 	PhpType nObjectType = new PhpType().add("Nette\\Object");
 
@@ -31,11 +30,6 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 	public NetteObjectFieldsCompletionContributor() {
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement().withParent(MemberReference.class), new MagicFieldMemberRefCompletionProvider());
 		extend(CompletionType.BASIC, PlatformPatterns.psiElement().withParent(MemberReference.class), new EventMethodMemberRefCompletionProvider());
-	}
-
-	@Override
-	public void fillCompletionVariants(CompletionParameters parameters, CompletionResultSet result) {
-		super.fillCompletionVariants(parameters, result);    //To change body of overridden methods use File | Settings | File Templates.
 	}
 
 
@@ -81,6 +75,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 		}
 	}
 
+
 	private class EventMethodMemberRefCompletionProvider extends CompletionProvider<CompletionParameters> {
 		@Override
 		protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext processingContext, @NotNull CompletionResultSet results) {
@@ -98,23 +93,32 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 			}
 
 			HashMap<String, Field> eventFields = FieldFinder.findEventFields(type, phpIndex);
-
+			Set<String> classMethods = new HashSet<String>();
+			for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
+				for (Method method : cls.getMethods()) {
+					classMethods.add(method.getName());
+				}
+			}
 			for (Map.Entry fieldEntry : eventFields.entrySet()) {
 				Field field = (Field) fieldEntry.getValue();
-
-				PhpLookupElement item = new PhpLookupElement(field.getName(), PhpFieldIndex.KEY, position.getProject(), null);
-
-				item.typeText = "void";
-				item.handler = PhpFunctionInsertHandler.getInstance();
-				item.bold = true;
-				item.tailText = "()";
-
+				if (classMethods.contains(field.getName())) {
+					continue;
+				}
 				RowIcon icon = new RowIcon(2);
 				icon.setIcon(PhpIcons.METHOD, 0);
 				icon.setIcon(PhpIcons.PUBLIC, 1);
-				item.icon = icon;
+				LookupElementBuilder lookupElement = LookupElementBuilder.create(field.getName() + "()")
+						.withTypeText("void")
+						.withIcon(icon)
+						.withInsertHandler(new InsertHandler<LookupElement>() {
+							@Override
+							public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
+								insertionContext.getEditor().getCaretModel().moveCaretRelatively(-1, 0, false, false, true);
+							}
+						});
 
-				results.addElement(item);
+
+				results.addElement(lookupElement);
 			}
 		}
 	}
