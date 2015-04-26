@@ -7,6 +7,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
+import cz.juzna.intellij.nette.utils.ComponentUtil;
 import cz.juzna.intellij.nette.utils.ElementValueResolver;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import cz.juzna.intellij.nette.utils.StringUtil;
@@ -17,8 +18,6 @@ import java.util.Collection;
 
 
 public class ComponentTypeProvider implements PhpTypeProvider2 {
-
-	private static PhpType container = new PhpType().add("Nette\\ComponentModel\\Container");
 
 	@Override
 	public char getKey() {
@@ -64,7 +63,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			return null;
 		}
 		for (PhpClass currentClass : PhpIndexUtil.getClasses(type, PhpIndex.getInstance(el.getProject()))) {
-			if (!isSubclassOfContainer(currentClass)) {
+			if (!ComponentUtil.isContainer(currentClass)) {
 				continue;
 			}
 			String method = "createComponent" + StringUtil.upperFirst(componentName);
@@ -86,7 +85,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 		Collection<PhpClass> classes = PhpIndex.getInstance(project).getClassesByFQN(s.substring(0, dot));
 		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
 		for (PhpClass cls : classes) {
-			if (!isSubclassOfContainer(cls)) {
+			if (!ComponentUtil.isContainer(cls)) {
 				continue;
 			}
 			Method m = cls.findMethodByName(method);
@@ -95,16 +94,6 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			}
 		}
 		return result;
-	}
-
-	private boolean isSubclassOfContainer(PhpClass checkedClass) {
-		while ((checkedClass = checkedClass.getSuperClass()) != null) {
-			if (container.isConvertibleFrom(checkedClass.getType(), PhpIndex.getInstance(checkedClass.getProject()))) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 }
