@@ -10,8 +10,8 @@
 
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Nette -->
-		<php.typeProvider2 implementation="cz.juzna.intellij.nette.NetteObjectFieldsTypeProvider"/>
-		<php.typeProvider2 implementation="cz.juzna.intellij.nette.ComponentTypeProvider"/>
+		<php.typeProvider2 implementation="cz.juzna.intellij.nette.typeProvider.NetteObjectFieldsTypeProvider"/>
+		<php.typeProvider2 implementation="cz.juzna.intellij.nette.typeProvider.ComponentTypeProvider"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
 	</extensions>

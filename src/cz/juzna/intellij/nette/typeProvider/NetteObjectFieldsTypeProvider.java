@@ -1,4 +1,4 @@
-package cz.juzna.intellij.nette;
+package cz.juzna.intellij.nette.typeProvider;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -10,6 +10,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
+import cz.juzna.intellij.nette.FieldFinder;
+import cz.juzna.intellij.nette.MagicFieldsTypesHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -18,11 +20,9 @@ import java.util.Collection;
 
 public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 
-	static char key = '\u0223';
-
 	@Override
 	public char getKey() {
-		return key;
+		return '\u0223';
 	}
 
 	@Nullable

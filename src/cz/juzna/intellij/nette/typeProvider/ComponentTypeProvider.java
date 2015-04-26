@@ -1,4 +1,4 @@
-package cz.juzna.intellij.nette;
+package cz.juzna.intellij.nette.typeProvider;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
