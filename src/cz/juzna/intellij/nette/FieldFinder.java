@@ -6,6 +6,7 @@ import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import cz.juzna.intellij.nette.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -26,11 +27,11 @@ public class FieldFinder {
 					String fieldName;
 
 					if (name.startsWith("get") && name.length() > 3) {
-						fieldName = lcfirst(name.substring(3));
+						fieldName = StringUtil.lowerFirst(name.substring(3));
 					} else if (name.startsWith("is") && name.length() > 2) {
-						fieldName = lcfirst(name.substring(2));
+						fieldName = StringUtil.lowerFirst(name.substring(2));
 					} else if (name.startsWith("set") && name.length() > 3 && method.getParameters().length == 1) {
-						fieldName = lcfirst(name.substring(3));
+						fieldName = StringUtil.lowerFirst(name.substring(3));
 					} else {
 						continue;
 					}
@@ -74,17 +75,4 @@ public class FieldFinder {
 		return fields;
 	}
 
-	private static String lcfirst(String string) {
-		StringBuilder s = new StringBuilder();
-
-		if (string.length() > 0) {
-			s.append(Character.toLowerCase(string.charAt(0)));
-		}
-
-		if (string.length() > 1) {
-			s.append(string.substring(1));
-		}
-
-		return s.toString();
-	}
 }
