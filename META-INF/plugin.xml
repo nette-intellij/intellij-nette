@@ -12,6 +12,6 @@
 		<!-- Nette -->
 		<php.typeProvider2 implementation="cz.juzna.intellij.nette.NetteObjectFieldsTypeProvider"/>
 		<php.typeProvider2 implementation="cz.juzna.intellij.nette.ComponentTypeProvider"/>
-		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.NetteObjectFieldsCompletionContributor"/>
+		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 	</extensions>
 </idea-plugin>

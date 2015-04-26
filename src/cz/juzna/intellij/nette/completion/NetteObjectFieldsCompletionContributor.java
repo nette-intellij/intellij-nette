@@ -1,4 +1,4 @@
-package cz.juzna.intellij.nette;
+package cz.juzna.intellij.nette.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
@@ -14,6 +14,8 @@ import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
+import cz.juzna.intellij.nette.FieldFinder;
+import cz.juzna.intellij.nette.MagicFieldsTypesHelper;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
