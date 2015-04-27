@@ -41,17 +41,22 @@ public class ComponentCompletionContributor extends CompletionContributor {
 			} else {
 				return;
 			}
-			for (PhpClass cls : PhpIndexUtil.getClasses(type, PhpIndex.getInstance(position.getProject()))) {
+			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
+			for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
 				if (!ComponentUtil.isContainer(cls)) {
 					continue;
 				}
 				for (Method method : cls.getMethods()) {
-					if (!method.getName().startsWith("createComponent")) {
+					if (!method.getName().startsWith("createComponent") || method.getName().equals("createComponent")) {
 						continue;
 					}
 					String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
 					LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
-					lookupElement = lookupElement.withTypeText(method.getType().toStringResolved());
+					PhpType returnType = new PhpType();
+					for (PhpClass typeCls : PhpIndexUtil.getClasses(method.getType(), phpIndex)) {
+						returnType.add(typeCls.getType());
+					}
+					lookupElement = lookupElement.withTypeText(returnType.toString()); //TODO: use toStringRelativized
 					result.addElement(lookupElement);
 				}
 			}
