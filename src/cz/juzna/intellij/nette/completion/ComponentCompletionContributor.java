@@ -34,7 +34,9 @@ public class ComponentCompletionContributor extends CompletionContributor {
 
 			} else if (position.getParent().getParent() instanceof MethodReference) {
 				MethodReference methodReference = (MethodReference) position.getParent().getParent();
-				if (methodReference.getClassReference() == null) {
+				if (methodReference.getName() == null
+						|| !methodReference.getName().equals("getComponent")
+						|| methodReference.getClassReference() == null) {
 					return;
 				}
 				type = methodReference.getClassReference().getType();
