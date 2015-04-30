@@ -15,5 +15,6 @@
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.CompilerExtensionCompletionContributor"/>
+		<psi.referenceContributor implementation="cz.juzna.intellij.nette.reference.ComponentReferenceContributor"/>
 	</extensions>
 </idea-plugin>
