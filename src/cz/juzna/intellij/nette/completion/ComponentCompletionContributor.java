@@ -24,43 +24,19 @@ public class ComponentCompletionContributor extends CompletionContributor {
 		@Override
 		protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 			PsiElement position = parameters.getPosition().getOriginalElement().getParent();
-			PhpType type;
-			if (position.getParent() instanceof ArrayIndex) {
-				ArrayAccessExpression expr = (ArrayAccessExpression) position.getParent().getParent();
-				if (!(expr.getValue() instanceof PhpTypedElement)) {
-					return;
-				}
-				type = ((PhpTypedElement) expr.getValue()).getType();
-
-			} else if (position.getParent().getParent() instanceof MethodReference) {
-				MethodReference methodReference = (MethodReference) position.getParent().getParent();
-				if (methodReference.getName() == null
-						|| !methodReference.getName().equals("getComponent")
-						|| methodReference.getClassReference() == null) {
-					return;
-				}
-				type = methodReference.getClassReference().getType();
-			} else {
+			if (position.getParent() == null || position.getParent().getParent() == null) {
 				return;
 			}
 			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
-			for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
-				if (!ComponentUtil.isContainer(cls)) {
-					continue;
+			for (Method method : ComponentUtil.getFactoryMethods(position.getParent().getParent())) {
+				String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
+				LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
+				PhpType returnType = new PhpType();
+				for (PhpClass typeCls : PhpIndexUtil.getClasses(method.getType(), phpIndex)) {
+					returnType.add(typeCls.getType());
 				}
-				for (Method method : cls.getMethods()) {
-					if (!method.getName().startsWith("createComponent") || method.getName().equals("createComponent")) {
-						continue;
-					}
-					String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
-					LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
-					PhpType returnType = new PhpType();
-					for (PhpClass typeCls : PhpIndexUtil.getClasses(method.getType(), phpIndex)) {
-						returnType.add(typeCls.getType());
-					}
-					lookupElement = lookupElement.withTypeText(returnType.toString()); //TODO: use toStringRelativized
-					result.addElement(lookupElement);
-				}
+				lookupElement = lookupElement.withTypeText(returnType.toString()); //TODO: use toStringRelativized
+				result.addElement(lookupElement);
 			}
 		}
 	}

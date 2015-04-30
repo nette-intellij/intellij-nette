@@ -5,12 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
-import cz.juzna.intellij.nette.utils.ElementValueResolver;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
-import cz.juzna.intellij.nette.utils.StringUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,49 +27,11 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 		if (DumbService.getInstance(el.getProject()).isDumb()) {
 			return null;
 		}
-
-		PhpType type = null;
-		String componentName = null;
-
-		if (el instanceof ArrayAccessExpression) {
-			ArrayIndex index = ((ArrayAccessExpression) el).getIndex();
-			if (index == null || !(el.getFirstChild() instanceof PhpTypedElement)) {
-				return null;
-			}
-			componentName = ElementValueResolver.resolve(index.getValue());
-			if (componentName == null) {
-				return null;
-			}
-			type = ((PhpTypedElement) el.getFirstChild()).getType();
-
-		} else if (el instanceof MethodReference) {
-			MethodReference methodRef = (MethodReference) el;
-			if (methodRef.getClassReference() == null
-					|| methodRef.getName() == null
-					|| !methodRef.getName().equals("getComponent")
-					|| methodRef.getParameters().length != 1) {
-				return null;
-			}
-			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
-			if (componentName == null) {
-				return null;
-			}
-			type = methodRef.getClassReference().getType();
-		}
-		if (type == null) {
-			return null;
-		}
-		for (PhpClass currentClass : PhpIndexUtil.getClasses(type, PhpIndex.getInstance(el.getProject()))) {
-			if (!ComponentUtil.isContainer(currentClass)) {
-				continue;
-			}
-			String method = "createComponent" + StringUtil.upperFirst(componentName);
-			Method m = currentClass.findMethodByName(method);
-			if (m != null) {
-				return currentClass.getFQN() + "." + method;
+		for (Method method : ComponentUtil.getFactoryMethods(el, true)) {
+			if (method.getContainingClass() != null) {
+				return method.getContainingClass().getFQN() + "." + method.getName();
 			}
 		}
-
 		return null;
 	}
 
