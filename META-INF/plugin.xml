@@ -4,7 +4,7 @@
 	<version>0.1</version>
 	<vendor>juzna.cz</vendor>
 
-	<idea-version since-build="129.1"/>
+	<idea-version since-build="130.1"/>
 	<depends>com.intellij.modules.lang</depends>
 	<depends>com.jetbrains.php</depends>
 
