@@ -6,6 +6,7 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,6 +77,16 @@ public class ComponentUtil {
 		Method[] result = new Method[methods.size()];
 
 		return methods.toArray(result);
+	}
+
+
+	@Nullable
+	public static String methodToComponentName(String methodName)
+	{
+		if (!methodName.startsWith(factoryMethodPrefix) || methodName.length() <= factoryMethodPrefix.length()) {
+			return null;
+		}
+		return StringUtil.lowerFirst(methodName.substring(factoryMethodPrefix.length()));
 	}
 
 }
