@@ -10,8 +10,7 @@ import java.util.Collection;
 
 public class MagicFieldsTypesHelper {
 	@Nullable
-	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types)
-	{
+	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
 		PhpType fieldType = null;
 
 		for (Method method : types) {

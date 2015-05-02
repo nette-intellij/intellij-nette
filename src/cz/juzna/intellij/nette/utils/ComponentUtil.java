@@ -21,14 +21,12 @@ public class ComponentUtil {
 	}
 
 	@NotNull
-	public static Method[] getFactoryMethods(PsiElement el)
-	{
+	public static Method[] getFactoryMethods(PsiElement el) {
 		return getFactoryMethods(el, false);
 	}
 
 	@NotNull
-	public static Method[] getFactoryMethods(PsiElement el, boolean onlyWithName)
-	{
+	public static Method[] getFactoryMethods(PsiElement el, boolean onlyWithName) {
 		PhpType type = null;
 		String componentName = null;
 
@@ -81,8 +79,7 @@ public class ComponentUtil {
 
 
 	@Nullable
-	public static String methodToComponentName(String methodName)
-	{
+	public static String methodToComponentName(String methodName) {
 		if (!methodName.startsWith(factoryMethodPrefix) || methodName.length() <= factoryMethodPrefix.length()) {
 			return null;
 		}
