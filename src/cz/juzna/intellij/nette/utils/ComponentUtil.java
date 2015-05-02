@@ -13,6 +13,7 @@ import java.util.Collection;
 public class ComponentUtil {
 
 	private static PhpType container = new PhpType().add("Nette\\ComponentModel\\Container");
+	public static String factoryMethodPrefix = "createComponent";
 
 	public static boolean isContainer(PhpClass csl) {
 		return container.isConvertibleFrom(csl.getType(), PhpIndex.getInstance(csl.getProject()));
@@ -59,14 +60,14 @@ public class ComponentUtil {
 				continue;
 			}
 			if (onlyWithName) {
-				String method = "createComponent" + StringUtil.upperFirst(componentName);
+				String method = factoryMethodPrefix + StringUtil.upperFirst(componentName);
 				Method m = currentClass.findMethodByName(method);
 				if (m != null) {
 					methods.add(m);
 				}
 			} else {
 				for (Method method : currentClass.getMethods()) {
-					if (method.getName().startsWith("createComponent")) {
+					if (method.getName().startsWith(factoryMethodPrefix) && method.getName().length() > factoryMethodPrefix.length()) {
 						methods.add(method);
 					}
 				}
