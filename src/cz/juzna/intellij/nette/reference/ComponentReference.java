@@ -3,7 +3,9 @@ package cz.juzna.intellij.nette.reference;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.ResolveResult;
+import com.intellij.util.IncorrectOperationException;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,4 +51,16 @@ public class ComponentReference extends PsiReferenceBase.Poly<PsiElement> {
 	public Object[] getVariants() {
 		return new Object[0];
 	}
+
+	@Override
+	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+		String componentName = ComponentUtil.methodToComponentName(newElementName);
+		if (getElement() instanceof StringLiteralExpression && componentName != null) {
+			((StringLiteralExpression) getElement()).updateText(componentName);
+			return getElement();
+		}
+
+		return super.handleElementRename(newElementName);
+	}
+
 }
