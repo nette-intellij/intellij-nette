@@ -2,9 +2,12 @@ package cz.juzna.intellij.nette.typeProvider;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
+import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.FieldReference;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
@@ -36,6 +39,19 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 		}
 		FieldReference field = (FieldReference) e;
 		if (field.getClassReference() == null) {
+			return null;
+		}
+		Method method = PhpPsiUtil.getParentByCondition(field, new Condition<PsiElement>() {
+			@Override
+			public boolean value(PsiElement element) {
+				return element instanceof Method;
+			}
+		});
+		String methodName = method != null ? method.getName().toLowerCase() : null;
+		if (method != null
+				&& (methodName.equalsIgnoreCase("get" + field.getName())
+						|| methodName.equalsIgnoreCase("set" + field.getName())
+						|| methodName.equalsIgnoreCase("is" + field.getName()))) {
 			return null;
 		}
 		PhpIndex phpIndex = PhpIndex.getInstance(e.getProject());
