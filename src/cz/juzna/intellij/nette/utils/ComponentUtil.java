@@ -49,7 +49,7 @@ public class ComponentUtil {
 			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
 			type = methodRef.getClassReference().getType();
 		}
-		if (type == null || (componentName == null && onlyWithName)) {
+		if (type == null || type.isEmpty() || type.toString().trim().equals("") || (componentName == null && onlyWithName)) {
 			return new Method[0];
 		}
 
