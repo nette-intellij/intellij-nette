@@ -15,8 +15,15 @@
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.CompilerExtensionCompletionContributor"/>
+		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.PhpDocCompletionContributor"/>
 		<psi.referenceContributor language="PHP" implementation="cz.juzna.intellij.nette.reference.ComponentReferenceContributor"/>
 		<referencesSearch implementation="cz.juzna.intellij.nette.reference.ComponentReferenceSearch"/>
+
+		<localInspection language="PHP" shortName="NonPublicInject"  id="NonPublicInject" displayName="Non-public @inject property"
+						 groupName="Nette"
+						 implementationClass="cz.juzna.intellij.nette.inspections.NonPublicInjectInspection"
+						 level="ERROR" enabledByDefault="true"/>
+
 	</extensions>
 
 	<actions>
