@@ -18,4 +18,13 @@
 		<psi.referenceContributor language="PHP" implementation="cz.juzna.intellij.nette.reference.ComponentReferenceContributor"/>
 		<referencesSearch implementation="cz.juzna.intellij.nette.reference.ComponentReferenceSearch"/>
 	</extensions>
+
+	<actions>
+		<group id="ListenerGenerators">
+			<action class="cz.juzna.intellij.nette.actions.GenerateInlineListenerAction" id="GenerateInlineListenerAction2"
+					text="Event listener"
+					description="Create inline listener."/>
+			<add-to-group group-id="GenerateGroup" anchor="last"/>
+		</group>
+	</actions>
 </idea-plugin>
