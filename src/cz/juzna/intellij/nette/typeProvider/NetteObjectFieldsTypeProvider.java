@@ -4,7 +4,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
@@ -13,8 +12,7 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
-import cz.juzna.intellij.nette.FieldFinder;
-import cz.juzna.intellij.nette.MagicFieldsTypesHelper;
+import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -55,11 +53,11 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 			return null;
 		}
 		PhpIndex phpIndex = PhpIndex.getInstance(e.getProject());
-		HashMap<String, Collection<Method>> fields = FieldFinder.findMagicFields(field.getClassReference().getType(), phpIndex);
+		HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(field.getClassReference().getType(), phpIndex);
 		if (!fields.containsKey(field.getName())) {
 			return null;
 		}
-		PhpType phpType = MagicFieldsTypesHelper.extractTypeFromMethodTypes(fields.get(field.getName()));
+		PhpType phpType = MagicFieldsUtil.extractTypeFromMethodTypes(fields.get(field.getName()));
 		if (phpType == null) {
 			return null;
 		}

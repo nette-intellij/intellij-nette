@@ -1,19 +1,44 @@
-package cz.juzna.intellij.nette;
+package cz.juzna.intellij.nette.utils;
 
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.Parameter;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
-import cz.juzna.intellij.nette.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class FieldFinder {
+public class MagicFieldsUtil {
+
+	@Nullable
+	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
+		PhpType fieldType = null;
+
+		for (Method method : types) {
+			PhpType methodType;
+			if (method.getName().startsWith("set")) {
+				Parameter methodParam = method.getParameters()[0];
+				if (!methodParam.getDeclaredType().isEmpty()) {
+					methodType = methodParam.getDeclaredType();
+				} else if (methodParam.getDocTag() != null && !methodParam.getDocTag().getType().isEmpty()) {
+					methodType = methodParam.getDocTag().getType();
+				} else {
+					continue;
+				}
+			} else {
+				methodType = method.getType();
+			}
+
+			fieldType = fieldType == null ? methodType : PhpType.or(fieldType, methodType);
+		}
+
+		return fieldType;
+	}
 
 	@NotNull
 	public static HashMap<String, Collection<Method>> findMagicFields(PhpType type, PhpIndex phpIndex) {

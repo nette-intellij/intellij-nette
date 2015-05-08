@@ -14,8 +14,7 @@ import com.jetbrains.php.completion.PhpLookupElement;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
-import cz.juzna.intellij.nette.FieldFinder;
-import cz.juzna.intellij.nette.MagicFieldsTypesHelper;
+import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +52,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 				return;
 			}
 
-			HashMap<String, Collection<Method>> fields = FieldFinder.findMagicFields(type, phpIndex);
+			HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(type, phpIndex);
 
 			// build lookup list
 			for (String fieldName : fields.keySet()) {
@@ -61,7 +60,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 
 //				item.lookupString = "$" + item.lookupString;
 
-				PhpType fieldType = MagicFieldsTypesHelper.extractTypeFromMethodTypes(fields.get(fieldName));
+				PhpType fieldType = MagicFieldsUtil.extractTypeFromMethodTypes(fields.get(fieldName));
 
 				if (fieldType != null) {
 					item.typeText = fieldType.toStringRelativized(classRef.getNamespaceName());
@@ -94,7 +93,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 				return;
 			}
 
-			HashMap<String, Field> eventFields = FieldFinder.findEventFields(type, phpIndex);
+			HashMap<String, Field> eventFields = MagicFieldsUtil.findEventFields(type, phpIndex);
 			Set<String> classMethods = new HashSet<String>();
 			for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
 				for (Method method : cls.getMethods()) {
