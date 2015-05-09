@@ -1,11 +1,13 @@
 package cz.juzna.intellij.nette.utils;
 
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Field;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.Parameter;
-import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.completion.PhpVariantsUtil;
+import com.jetbrains.php.completion.UsageContext;
+import com.jetbrains.php.lang.psi.PhpPsiUtil;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,9 +43,15 @@ public class MagicFieldsUtil {
 	}
 
 	@NotNull
-	public static HashMap<String, Collection<Method>> findMagicFields(PhpType type, PhpIndex phpIndex) {
+	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference, PhpIndex phpIndex) {
+		PhpType type = reference.getType();
+
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
+		if (!(new PhpType().add("Nette\\Object")).isConvertibleFrom(type, phpIndex)) {
+			return fields;
+		}
 		for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
+			Collection<String> accessibleFields = null;
 			for (Method method : cls.getMethods()) {
 				String name = method.getName();
 				String fieldName;
@@ -54,6 +62,12 @@ public class MagicFieldsUtil {
 				} else if (name.startsWith("set") && name.length() > 3 && method.getParameters().length == 1) {
 					fieldName = StringUtil.lowerFirst(name.substring(3));
 				} else {
+					continue;
+				}
+				if (accessibleFields == null) {
+					accessibleFields = findAccessibleFields(cls, reference);
+				}
+				if (accessibleFields.contains(fieldName)) {
 					continue;
 				}
 
@@ -67,6 +81,24 @@ public class MagicFieldsUtil {
 			}
 		}
 
+		return fields;
+	}
+
+	private static Collection<String> findAccessibleFields(PhpClass cls, MemberReference reference) {
+		PhpClass containingClass = PhpPsiUtil.getParentByCondition(reference, PhpClass.INSTANCEOF);
+		Collection<String> fields = new ArrayList<String>();
+		UsageContext usageContext = new UsageContext(PhpModifier.State.PARENT);
+		usageContext.setTargetObjectClass(cls);
+		if (containingClass != null) {
+			usageContext.setClassForAccessFilter(containingClass);
+		}
+
+		for (LookupElement el : PhpVariantsUtil.getLookupItems(cls.getFields(), false, usageContext)) {
+			PsiElement psiEl = el.getPsiElement();
+			if (psiEl instanceof Field) {
+				fields.add(((Field) psiEl).getName());
+			}
+		}
 		return fields;
 	}
 

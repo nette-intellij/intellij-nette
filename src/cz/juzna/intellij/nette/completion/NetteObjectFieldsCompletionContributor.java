@@ -44,15 +44,9 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 			}
 
 			MemberReference classRef = (MemberReference) position;
-			PhpExpression classExpr = classRef.getClassReference();
-			PhpType type = classExpr.getType();
 			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
 
-			if (!nObjectType.isConvertibleFrom(type, phpIndex)) {
-				return;
-			}
-
-			HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(type, phpIndex);
+			HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(classRef, phpIndex);
 
 			// build lookup list
 			for (String fieldName : fields.keySet()) {

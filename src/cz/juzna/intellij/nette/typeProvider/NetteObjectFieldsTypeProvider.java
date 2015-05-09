@@ -39,21 +39,8 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 		if (field.getClassReference() == null) {
 			return null;
 		}
-		Method method = PhpPsiUtil.getParentByCondition(field, new Condition<PsiElement>() {
-			@Override
-			public boolean value(PsiElement element) {
-				return element instanceof Method;
-			}
-		});
-		String methodName = method != null ? method.getName().toLowerCase() : null;
-		if (method != null
-				&& (methodName.equalsIgnoreCase("get" + field.getName())
-						|| methodName.equalsIgnoreCase("set" + field.getName())
-						|| methodName.equalsIgnoreCase("is" + field.getName()))) {
-			return null;
-		}
 		PhpIndex phpIndex = PhpIndex.getInstance(e.getProject());
-		HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(field.getClassReference().getType(), phpIndex);
+		HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(field, phpIndex);
 		if (!fields.containsKey(field.getName())) {
 			return null;
 		}
