@@ -43,10 +43,10 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 		int dot = s.lastIndexOf('.');
 		String method = s.substring(dot + 1);
 
-		Collection<PhpClass> classes = PhpIndex.getInstance(project).getClassesByFQN(s.substring(0, dot));
+		Collection<PhpClass> classes = PhpIndex.getInstance(project).getAnyByFQN(s.substring(0, dot));
 		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
 		for (PhpClass cls : classes) {
-			if (!ComponentUtil.isContainer(cls)) {
+			if (!ComponentUtil.isContainer(cls) && !cls.isTrait()) {
 				continue;
 			}
 			Method m = cls.findMethodByName(method);
