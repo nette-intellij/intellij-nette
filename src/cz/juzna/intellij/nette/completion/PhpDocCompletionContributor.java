@@ -7,13 +7,12 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocPsiElement;
-import com.jetbrains.php.lang.documentation.phpdoc.psi.tags.PhpDocTag;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.GroupStatement;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
+import org.jetbrains.annotations.NotNull;
 
 public class PhpDocCompletionContributor extends CompletionContributor {
 
@@ -26,7 +25,7 @@ public class PhpDocCompletionContributor extends CompletionContributor {
 
 	private class PhpDocCompletionProvider extends CompletionProvider<CompletionParameters> {
 		@Override
-		protected void addCompletions(CompletionParameters parameters, ProcessingContext context, CompletionResultSet result) {
+		protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 			PsiElement position = parameters.getPosition().getOriginalElement();
 			PhpDocComment docComment = PhpPsiUtil.getParentByCondition(position, PhpDocComment.INSTANCEOF);
 			if (docComment == null) {
@@ -35,6 +34,9 @@ public class PhpDocCompletionContributor extends CompletionContributor {
 			PhpPsiElement next = docComment.getNextPsiSibling();
 			if (next instanceof GroupStatement) {
 				next = next.getFirstPsiChild();
+			}
+			if (next == null) {
+				return;
 			}
 			Field field = (Field) PhpPsiUtil.getChildOfType(next, PhpElementTypes.CLASS_FIELD);
 			if (field == null) {
