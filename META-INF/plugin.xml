@@ -1,8 +1,28 @@
 <idea-plugin version="2">
 	<name>Nette framework helpers</name>
 	<description>Nette development with pleasure</description>
-	<version>0.1</version>
+	<version>0.2.0</version>
 	<vendor>juzna.cz</vendor>
+	<change-notes><![CDATA[
+	<h2>0.2.0</h2>
+	<ul>
+	    <li>Components: created completion contributor for component access using ArrayAccess or getComponent method</li>
+	    <li>Components: created reference contributor from ArrayAccess/getComponent access to createComponent* method</li>
+	    <li>Components: added references search for "Find usages" action</li>
+	    <li>Components: added TypeProvider for components access</li>
+	    <li>Components: added refactoring support (rename component access when renaming createComponent* method)</li>
+	    <li>@inject annotation completion provider</li>
+	    <li>@inject annotation inspection: check if property is public</li>
+	    <li>Added listener generator action for nette/object events (experimental)</li>
+	    <li>Refactoring, removed deprecated stuffs..</li>
+	    <li>Removed Pd\Entity support</li>
+	</ul>
+    <h2>0.1.0</h2>
+    <ul>
+        <li>Initial version</li>
+    </ul>
+	]]>
+    </change-notes>
 
 	<idea-version since-build="130.1"/>
 	<depends>com.intellij.modules.lang</depends>
