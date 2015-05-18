@@ -53,5 +53,7 @@
 					description="Create inline listener."/>
 			<add-to-group group-id="GenerateGroup" anchor="last"/>
 		</group>
+		<action class="cz.juzna.intellij.nette.actions.ViewComponentTreeAction" id="ComponentTreePopup" text="Show component tree"
+				description="Shows component tree in presenter or component"/>
 	</actions>
 </idea-plugin>

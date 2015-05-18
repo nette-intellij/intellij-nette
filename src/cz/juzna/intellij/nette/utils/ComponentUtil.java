@@ -55,26 +55,32 @@ public class ComponentUtil {
 
 		Collection<Method> methods = new ArrayList<Method>();
 		for (PhpClass currentClass : PhpIndexUtil.getClasses(type, PhpIndex.getInstance(el.getProject()))) {
-			if (!isContainer(currentClass)) {
-				continue;
-			}
-			if (onlyWithName) {
-				String method = factoryMethodPrefix + StringUtil.upperFirst(componentName);
-				Method m = currentClass.findMethodByName(method);
-				if (m != null) {
-					methods.add(m);
-				}
-			} else {
-				for (Method method : currentClass.getMethods()) {
-					if (method.getName().startsWith(factoryMethodPrefix) && method.getName().length() > factoryMethodPrefix.length()) {
-						methods.add(method);
-					}
-				}
-			}
+			methods.addAll(getFactoryMethods(currentClass, onlyWithName ? componentName : null));
 		}
 		Method[] result = new Method[methods.size()];
 
 		return methods.toArray(result);
+	}
+
+	public static Collection<Method> getFactoryMethods(@NotNull PhpClass cls, String componentName) {
+		Collection<Method> methods = new ArrayList<Method>();
+		if (!isContainer(cls)) {
+			return methods;
+		}
+		if (componentName != null) {
+			String method = factoryMethodPrefix + StringUtil.upperFirst(componentName);
+			Method m = cls.findMethodByName(method);
+			if (m != null) {
+				methods.add(m);
+			}
+		} else {
+			for (Method method : cls.getMethods()) {
+				if (method.getName().startsWith(factoryMethodPrefix) && method.getName().length() > factoryMethodPrefix.length()) {
+					methods.add(method);
+				}
+			}
+		}
+		return methods;
 	}
 
 
