@@ -48,6 +48,7 @@ public class ComponentTreePopup {
 		PsiTreeElementBase<PsiElement> root = new ComponentTreeElement(cls);
 		final StructureViewComponent structureView = new StructureViewComponent(fileEditor, new StructureViewModelBase(cls.getContainingFile(), editor, root), cls.getProject(), true);
 		structureView.setFocusable(true);
+		structureView.setAutoscrolls(false);
 
 		MnemonicHelper.init(structureView);
 		final JBPopup popup = JBPopupFactory.getInstance().createComponentPopupBuilder(structureView, (JComponent) null)
