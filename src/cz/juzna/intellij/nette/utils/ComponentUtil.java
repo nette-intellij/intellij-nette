@@ -62,7 +62,13 @@ public class ComponentUtil {
 		return methods.toArray(result);
 	}
 
+	@NotNull
 	public static Collection<Method> getFactoryMethods(@NotNull PhpClass cls, String componentName) {
+		return getFactoryMethods(cls, componentName, false);
+	}
+
+	@NotNull
+	public static Collection<Method> getFactoryMethods(@NotNull PhpClass cls, String componentName, boolean onlyOwn) {
 		Collection<Method> methods = new ArrayList<Method>();
 		if (!isContainer(cls)) {
 			return methods;
@@ -74,7 +80,15 @@ public class ComponentUtil {
 				methods.add(m);
 			}
 		} else {
-			for (Method method : cls.getMethods()) {
+			Method[] classMethods;
+			if (onlyOwn) {
+				Collection<Method> tmpMethods = cls.getMethods();
+				classMethods = new Method[tmpMethods.size()];
+				tmpMethods.toArray(classMethods);
+			} else {
+				classMethods = cls.getOwnMethods();
+			}
+			for (Method method : classMethods) {
 				if (method.getName().startsWith(factoryMethodPrefix) && method.getName().length() > factoryMethodPrefix.length()) {
 					methods.add(method);
 				}

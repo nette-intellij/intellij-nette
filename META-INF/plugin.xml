@@ -43,7 +43,10 @@
 						 groupName="Nette"
 						 implementationClass="cz.juzna.intellij.nette.inspections.NonPublicInjectInspection"
 						 level="ERROR" enabledByDefault="true"/>
-
+		<localInspection language="PHP" shortName="CreateComponentReturnFormType"  id="CreateComponentReturnFormType" displayName="Form return type of createComponent*"
+						 groupName="Nette"
+						 implementationClass="cz.juzna.intellij.nette.inspections.CreateComponentReturnFormTypeInspection"
+						 level="WARNING" enabledByDefault="true"/>
 	</extensions>
 
 	<actions>
