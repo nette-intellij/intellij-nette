@@ -1,9 +1,14 @@
 <idea-plugin version="2">
 	<name>Nette framework helpers</name>
 	<description>Nette development with pleasure</description>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<vendor>juzna.cz</vendor>
 	<change-notes><![CDATA[
+	<h2>0.2.1</h2>
+	<ul>
+		<li>Magic fields: completion fix</li>
+		<li>fixed infinite recursion in PhpIndexUtil</li>
+	</ul>
 	<h2>0.2.0</h2>
 	<ul>
 	    <li>Components: created completion contributor for component access using ArrayAccess or getComponent method</li>
