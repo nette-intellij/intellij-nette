@@ -44,10 +44,10 @@ public class MagicFieldsUtil {
 
 	@NotNull
 	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference, PhpIndex phpIndex) {
-		PhpType type = reference.getType();
+		PhpType type = reference.getClassReference() != null ? reference.getClassReference().getType() : null;
 
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
-		if (!(new PhpType().add("Nette\\Object")).isConvertibleFrom(type, phpIndex)) {
+		if (type == null || !(new PhpType().add("Nette\\Object")).isConvertibleFrom(type, phpIndex)) {
 			return fields;
 		}
 		for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
