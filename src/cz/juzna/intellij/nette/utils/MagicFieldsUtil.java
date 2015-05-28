@@ -17,6 +17,8 @@ import java.util.Collection;
 
 public class MagicFieldsUtil {
 
+	private static PhpType netteObject = new PhpType().add("Nette\\Object");
+
 	@Nullable
 	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
 		PhpType fieldType = null;
@@ -47,10 +49,13 @@ public class MagicFieldsUtil {
 		PhpType type = reference.getClassReference() != null ? reference.getClassReference().getType() : null;
 
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
-		if (type == null || !(new PhpType().add("Nette\\Object")).isConvertibleFrom(type, phpIndex)) {
+		if (type == null) {
 			return fields;
 		}
 		for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
+			if (!netteObject.isConvertibleFrom(cls.getType(), phpIndex)) {
+				continue;
+			}
 			Collection<String> accessibleFields = null;
 			for (Method method : cls.getMethods()) {
 				String name = method.getName();
