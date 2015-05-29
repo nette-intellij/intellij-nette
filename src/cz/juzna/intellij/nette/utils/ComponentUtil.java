@@ -81,7 +81,7 @@ public class ComponentUtil {
 			}
 		} else {
 			Method[] classMethods;
-			if (onlyOwn) {
+			if (!onlyOwn) {
 				Collection<Method> tmpMethods = cls.getMethods();
 				classMethods = new Method[tmpMethods.size()];
 				tmpMethods.toArray(classMethods);

@@ -124,7 +124,7 @@ public class ComponentTreePopup {
 				Method method = (Method) getElement();
 				for (PhpClass cls : PhpIndexUtil.getClasses(method.getType(), PhpIndex.getInstance(method.getProject()))) {
 					children.add(new ComponentTreeElement(cls, false));
-					for (Method m : ComponentUtil.getFactoryMethods( cls, null)) {
+					for (Method m : ComponentUtil.getFactoryMethods(cls, null)) {
 						children.add(new ComponentTreeElement(m));
 					}
 				}
