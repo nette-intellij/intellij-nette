@@ -2,11 +2,9 @@ package cz.juzna.intellij.nette.typeProvider;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.FieldReference;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
@@ -44,23 +42,19 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 		if (!fields.containsKey(field.getName())) {
 			return null;
 		}
-		PhpType phpType = MagicFieldsUtil.extractTypeFromMethodTypes(fields.get(field.getName()));
-		if (phpType == null) {
-			return null;
+		for (Method method : fields.get(field.getName())) {
+			if (method.getName().startsWith("get") || method.getName().startsWith("is")) {
+				return "#M#C" + method.getContainingClass().getFQN() + "." + method.getName();
+			}
 		}
-		return phpType.toStringResolved();
+
+		return null;
 	}
 
 	@Override
 	public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
 		PhpIndex index = PhpIndex.getInstance(project);
-		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
-		for (String type : s.split("\\|")) {
-			result.addAll(index.getAnyByFQN(type));
-		}
-
-
-		return result;
+		return index.getBySignature(s);
 	}
 
 
