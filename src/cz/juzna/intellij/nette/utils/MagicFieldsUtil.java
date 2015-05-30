@@ -21,7 +21,7 @@ public class MagicFieldsUtil {
 
 	@Nullable
 	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
-		PhpType fieldType = null;
+		PhpType fieldType = new PhpType();
 
 		for (Method method : types) {
 			PhpType methodType;
@@ -38,7 +38,15 @@ public class MagicFieldsUtil {
 				methodType = method.getType();
 			}
 
-			fieldType = fieldType == null ? methodType : PhpType.or(fieldType, methodType);
+			for (String type : methodType.getTypes()) {
+				if (type.startsWith("#")) {
+					for (PhpNamedElement el : PhpIndex.getInstance(method.getProject()).getBySignature(type)) {
+						fieldType.add(el.getType());
+					}
+				} else {
+					fieldType.add(type);
+				}
+			}
 		}
 
 		return fieldType;
