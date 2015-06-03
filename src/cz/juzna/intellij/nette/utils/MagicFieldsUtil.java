@@ -51,6 +51,35 @@ public class MagicFieldsUtil {
 		return fieldType;
 	}
 
+	public static Collection<Method> findGetters(FieldReference fieldReference) {
+		Map<String, PhpClass> classesInFile = cz.juzna.intellij.nette.utils.PhpPsiUtil.getClassesInFile(fieldReference);
+		Collection<Method> methods = new ArrayList<Method>();
+		for (PhpClass cls : ClassFinder.getFromMemberReference(fieldReference)) {
+			if (!isNetteObject(cls, classesInFile)) {
+				continue;
+			}
+			Method method = cls.findMethodByName("get" + StringUtil.upperFirst(fieldReference.getName()));
+			if (method == null) {
+				method = cls.findMethodByName("is" + StringUtil.upperFirst(fieldReference.getName()));
+			}
+			if (method == null) {
+				continue;
+			}
+			ArrayList<PhpNamedElement> elements = new ArrayList<PhpNamedElement>();
+//			elements.add(method); //todo: probably causes recursion, find better way to check visibility
+			Field field = cls.findFieldByName(fieldReference.getName(), false);
+			if (field != null) {
+				elements.add(field);
+			}
+			Collection<String> accessible = findAccessibleMembers(cls, fieldReference, elements);
+
+			if (!accessible.contains(fieldReference.getName())/* && accessible.contains(method.getName())*/) {
+				methods.add(method);
+			}
+		}
+		return methods;
+	}
+
 	@NotNull
 	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference) {
 
@@ -94,21 +123,26 @@ public class MagicFieldsUtil {
 	}
 
 	private static Collection<String> findAccessibleFields(PhpClass cls, MemberReference reference) {
+		return findAccessibleMembers(cls, reference, cls.getFields());
+	}
+
+	private static Collection<String> findAccessibleMembers(PhpClass cls, MemberReference reference, Collection<? extends PhpNamedElement> elements) {
+
 		PhpClass containingClass = PhpPsiUtil.getParentByCondition(reference, PhpClass.INSTANCEOF);
-		Collection<String> fields = new ArrayList<String>();
+		Collection<String> members = new ArrayList<String>();
 		UsageContext usageContext = new UsageContext(PhpModifier.State.PARENT);
 		usageContext.setTargetObjectClass(cls);
 		if (containingClass != null) {
 			usageContext.setClassForAccessFilter(containingClass);
 		}
 
-		for (LookupElement el : PhpVariantsUtil.getLookupItems(cls.getFields(), false, usageContext)) {
+		for (LookupElement el : PhpVariantsUtil.getLookupItems(elements, false, usageContext)) {
 			PsiElement psiEl = el.getPsiElement();
-			if (psiEl instanceof Field) {
-				fields.add(((Field) psiEl).getName());
+			if (psiEl instanceof PhpNamedElement) {
+				members.add(((PhpNamedElement) psiEl).getName());
 			}
 		}
-		return fields;
+		return members;
 	}
 
 	@NotNull

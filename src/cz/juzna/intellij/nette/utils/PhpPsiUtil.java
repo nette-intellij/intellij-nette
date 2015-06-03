@@ -21,22 +21,21 @@ public class PhpPsiUtil {
 	}
 
 	public static boolean isTypeOf(PhpClass cls, String typeFqn, Map<String, PhpClass> classMap) {
-		typeFqn = typeFqn.toLowerCase();
-		if (typeFqn.startsWith("\\")) {
-			typeFqn = typeFqn.substring(1);
+		if (cls.getFQN() == null) {
+			return false;
+		}
+		if (typeEquals(typeFqn, cls.getFQN())) {
+			return true;
 		}
 		while (true) {
-			if (cls.getFQN() == null) {
+			String fqn = cls.getSuperFQN();
+			if (fqn == null) {
 				return false;
 			}
-			String fqn = cls.getFQN();
-			if (fqn.startsWith("\\")) {
-				fqn = fqn.substring(1);
-			}
-			if (fqn.toLowerCase().equals(typeFqn)) {
+			if (typeEquals(typeFqn, fqn)) {
 				return true;
 			}
-			if (classMap.containsKey(cls.getSuperFQN())) {
+			if (classMap.containsKey(fqn)) {
 				cls = classMap.get(cls.getSuperFQN());
 			} else {
 				cls = cls.getSuperClass();
@@ -45,6 +44,20 @@ public class PhpPsiUtil {
 				return false;
 			}
 		}
+	}
+
+	private static boolean typeEquals(String type1, String type2)
+	{
+		type1 = type1.toLowerCase();
+		type2 = type2.toLowerCase();
+		if (type1.startsWith("\\")) {
+			type1 = type1.substring(1);
+		}
+		if (type2.startsWith("\\")) {
+			type2 = type2.substring(1);
+		}
+
+		return type1.equals(type2);
 	}
 
 }
