@@ -129,26 +129,7 @@ public class MagicFieldsUtil {
 
 
 	private static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
-		while (true) {
-			if (cls.getFQN() == null) {
-				return false;
-			}
-			String fqn = cls.getFQN();
-			if (fqn.substring(0, 1).equals("\\")) {
-				fqn = fqn.substring(1);
-			}
-			if (fqn.toLowerCase().equals("nette\\object")) {
-				return true;
-			}
-			if (classMap.containsKey(cls.getSuperFQN())) {
-				cls = classMap.get(cls.getSuperFQN());
-			} else {
-				cls = cls.getSuperClass();
-			}
-			if (cls == null || cls.getFQN() == null) {
-				return false;
-			}
-		}
+		return cz.juzna.intellij.nette.utils.PhpPsiUtil.isTypeOf(cls, "Nette\\Object", classMap);
 	}
 
 }

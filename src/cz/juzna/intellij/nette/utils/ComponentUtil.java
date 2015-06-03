@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 public class ComponentUtil {
 
@@ -18,6 +20,10 @@ public class ComponentUtil {
 
 	public static boolean isContainer(PhpClass csl) {
 		return container.isConvertibleFrom(csl.getType(), PhpIndex.getInstance(csl.getProject()));
+	}
+
+	public static boolean isContainer(PhpClass cls, Map<String, PhpClass> classMap) {
+		return PhpPsiUtil.isTypeOf(cls, "Nette\\ComponentModel\\Container", classMap);
 	}
 
 	@NotNull
@@ -51,8 +57,12 @@ public class ComponentUtil {
 			return new Method[0];
 		}
 		Collection<Method> methods = new ArrayList<Method>();
+		Map<String, PhpClass> classesInFile = PhpPsiUtil.getClassesInFile(el);
 		for (PhpClass currentClass : classes) {
-			methods.addAll(getFactoryMethods(currentClass, onlyWithName ? componentName : null));
+			if (!isContainer(currentClass, classesInFile)) {
+				continue;
+			}
+			methods.addAll(getFactoryMethodsInternal(currentClass, onlyWithName ? componentName : null, false));
 		}
 		Method[] result = new Method[methods.size()];
 
@@ -66,10 +76,15 @@ public class ComponentUtil {
 
 	@NotNull
 	public static Collection<Method> getFactoryMethods(@NotNull PhpClass cls, String componentName, boolean onlyOwn) {
-		Collection<Method> methods = new ArrayList<Method>();
 		if (!isContainer(cls)) {
-			return methods;
+			return Collections.emptyList();
 		}
+
+		return getFactoryMethodsInternal(cls, componentName, onlyOwn);
+	}
+
+	private static Collection<Method> getFactoryMethodsInternal(@NotNull PhpClass cls, String componentName, boolean onlyOwn) {
+		Collection<Method> methods = new ArrayList<Method>();
 		if (componentName != null) {
 			String method = factoryMethodPrefix + StringUtil.upperFirst(componentName);
 			Method m = cls.findMethodByName(method);
@@ -93,7 +108,6 @@ public class ComponentUtil {
 		}
 		return methods;
 	}
-
 
 	@Nullable
 	public static String methodToComponentName(String methodName) {
