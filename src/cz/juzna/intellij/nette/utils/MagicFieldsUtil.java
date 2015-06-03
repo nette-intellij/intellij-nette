@@ -14,10 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 public class MagicFieldsUtil {
-
-	private static PhpType netteObject = new PhpType().add("Nette\\Object");
 
 	@Nullable
 	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
@@ -53,15 +52,12 @@ public class MagicFieldsUtil {
 	}
 
 	@NotNull
-	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference, PhpIndex phpIndex) {
-		PhpType type = reference.getClassReference() != null ? reference.getClassReference().getType() : null;
+	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference) {
 
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
-		if (type == null) {
-			return fields;
-		}
-		for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
-			if (!netteObject.isConvertibleFrom(cls.getType(), phpIndex)) {
+		Map<String, PhpClass> classesInFile = cz.juzna.intellij.nette.utils.PhpPsiUtil.getClassesInFile(reference);
+		for (PhpClass cls : ClassFinder.getFromMemberReference(reference)) {
+			if (!isNetteObject(cls, classesInFile)) {
 				continue;
 			}
 			Collection<String> accessibleFields = null;
@@ -118,7 +114,7 @@ public class MagicFieldsUtil {
 	@NotNull
 	public static HashMap<String, Field> findEventFields(PhpType type, PhpIndex phpIndex) {
 		HashMap<String, Field> fields = new HashMap<String, Field>();
-		for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
+		for (PhpClass cls : ClassFinder.getClasses(type, phpIndex)) {
 			for (Field field : cls.getFields()) {
 				String name = field.getName();
 				if (name.length() <= 2 || !name.startsWith("on")) { // we want only "onEvent"
@@ -129,6 +125,30 @@ public class MagicFieldsUtil {
 		}
 
 		return fields;
+	}
+
+
+	private static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
+		while (true) {
+			if (cls.getFQN() == null) {
+				return false;
+			}
+			String fqn = cls.getFQN();
+			if (fqn.substring(0, 1).equals("\\")) {
+				fqn = fqn.substring(1);
+			}
+			if (fqn.toLowerCase().equals("nette\\object")) {
+				return true;
+			}
+			if (classMap.containsKey(cls.getSuperFQN())) {
+				cls = classMap.get(cls.getSuperFQN());
+			} else {
+				cls = cls.getSuperClass();
+			}
+			if (cls == null || cls.getFQN() == null) {
+				return false;
+			}
+		}
 	}
 
 }

@@ -8,12 +8,10 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.FieldReference;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
-import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
 import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -37,8 +35,7 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 		if (field.getClassReference() == null) {
 			return null;
 		}
-		PhpIndex phpIndex = PhpIndex.getInstance(e.getProject());
-		HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(field, phpIndex);
+		HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(field);
 		if (!fields.containsKey(field.getName())) {
 			return null;
 		}

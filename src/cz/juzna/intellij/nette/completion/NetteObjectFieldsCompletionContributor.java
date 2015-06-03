@@ -11,11 +11,14 @@ import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIcons;
 import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.completion.PhpLookupElement;
-import com.jetbrains.php.lang.psi.elements.*;
+import com.jetbrains.php.lang.psi.elements.Field;
+import com.jetbrains.php.lang.psi.elements.MemberReference;
+import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -44,15 +47,11 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 			}
 
 			MemberReference classRef = (MemberReference) position;
-			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
 
-			HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(classRef, phpIndex);
+			HashMap<String, Collection<Method>> fields = MagicFieldsUtil.findMagicFields(classRef);
 
-			// build lookup list
 			for (String fieldName : fields.keySet()) {
 				PhpLookupElement item = new PhpLookupElement(fieldName, PhpFieldIndex.KEY, position.getProject(), null);
-
-//				item.lookupString = "$" + item.lookupString;
 
 				PhpType fieldType = MagicFieldsUtil.extractTypeFromMethodTypes(fields.get(fieldName));
 
@@ -89,7 +88,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 
 			HashMap<String, Field> eventFields = MagicFieldsUtil.findEventFields(type, phpIndex);
 			Set<String> classMethods = new HashSet<String>();
-			for (PhpClass cls : PhpIndexUtil.getClasses(type, phpIndex)) {
+			for (PhpClass cls : ClassFinder.getFromMemberReference((MemberReference) position)) {
 				for (Method method : cls.getMethods()) {
 					classMethods.add(method.getName());
 				}

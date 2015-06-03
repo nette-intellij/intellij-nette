@@ -15,8 +15,8 @@ import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ElementValueResolver;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -45,7 +45,7 @@ public class CompilerExtensionCompletionContributor extends CompletionContributo
 				return;
 			}
 			boolean ok = false;
-			for (PhpClass cls : PhpIndexUtil.getClasses(methodReference.getClassReference().getType(), phpIndex)) {
+			for (PhpClass cls : ClassFinder.getFromMemberReference(methodReference)) {
 				if (serviceDefinition.isConvertibleFrom(cls.getType(), phpIndex)) {
 					ok = true;
 					break;

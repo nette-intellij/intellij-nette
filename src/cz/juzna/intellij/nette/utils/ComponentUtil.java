@@ -27,17 +27,15 @@ public class ComponentUtil {
 
 	@NotNull
 	public static Method[] getFactoryMethods(PsiElement el, boolean onlyWithName) {
-		PhpType type = null;
 		String componentName = null;
-
+		Collection<PhpClass> classes = null;
 		if (el instanceof ArrayAccessExpression) {
 			ArrayIndex index = ((ArrayAccessExpression) el).getIndex();
 			if (index == null || !(el.getFirstChild() instanceof PhpTypedElement)) {
 				return new Method[0];
 			}
 			componentName = ElementValueResolver.resolve(index.getValue());
-			type = ((PhpTypedElement) el.getFirstChild()).getType();
-
+			classes = ClassFinder.getFromTypedElement((PhpTypedElement) el.getFirstChild());
 		} else if (el instanceof MethodReference) {
 			MethodReference methodRef = (MethodReference) el;
 			if (methodRef.getClassReference() == null
@@ -47,14 +45,13 @@ public class ComponentUtil {
 				return new Method[0];
 			}
 			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
-			type = methodRef.getClassReference().getType();
+			classes = ClassFinder.getFromMemberReference(methodRef);
 		}
-		if (type == null || type.isEmpty() || type.toString().trim().equals("") || (componentName == null && onlyWithName)) {
+		if (classes == null || classes.isEmpty() || (componentName == null && onlyWithName)) {
 			return new Method[0];
 		}
-
 		Collection<Method> methods = new ArrayList<Method>();
-		for (PhpClass currentClass : PhpIndexUtil.getClasses(type, PhpIndex.getInstance(el.getProject()))) {
+		for (PhpClass currentClass : classes) {
 			methods.addAll(getFactoryMethods(currentClass, onlyWithName ? componentName : null));
 		}
 		Method[] result = new Method[methods.size()];

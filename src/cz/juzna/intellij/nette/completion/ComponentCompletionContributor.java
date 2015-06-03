@@ -5,13 +5,12 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import cz.juzna.intellij.nette.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,12 +28,11 @@ public class ComponentCompletionContributor extends CompletionContributor {
 			if (position.getParent() == null || position.getParent().getParent() == null) {
 				return;
 			}
-			PhpIndex phpIndex = PhpIndex.getInstance(position.getProject());
 			for (Method method : ComponentUtil.getFactoryMethods(position.getParent().getParent())) {
 				String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
 				LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
 				PhpType returnType = new PhpType();
-				for (PhpClass typeCls : PhpIndexUtil.getClasses(method.getType(), phpIndex)) {
+				for (PhpClass typeCls : ClassFinder.getFromTypedElement(method)) {
 					returnType.add(typeCls.getType());
 				}
 				lookupElement = lookupElement.withTypeText(returnType.toString()); //TODO: use toStringRelativized

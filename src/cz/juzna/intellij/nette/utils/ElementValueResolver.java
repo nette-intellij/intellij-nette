@@ -2,7 +2,6 @@ package cz.juzna.intellij.nette.utils;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.elements.*;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +45,7 @@ public class ElementValueResolver {
 				if (constantName.equals("class")) {
 					return classReference.getFQN();
 				}
-				for (PhpClass phpClass : PhpIndexUtil.getClasses(classReference.getType(), PhpIndex.getInstance(element.getProject()))) {
+				for (PhpClass phpClass : ClassFinder.getFromTypedElement(classReference)) {
 					Field constant = phpClass.findFieldByName(constantName, true);
 					if (constant != null && constant.isConstant()) {
 						try {

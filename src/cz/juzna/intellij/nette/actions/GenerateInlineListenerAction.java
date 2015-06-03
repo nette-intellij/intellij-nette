@@ -17,8 +17,8 @@ import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.PhpLanguage;
 import com.jetbrains.php.lang.psi.PhpPsiElementFactory;
 import com.jetbrains.php.lang.psi.elements.*;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ListenerGeneratorUtil;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -88,7 +88,7 @@ public class GenerateInlineListenerAction extends CodeInsightAction {
 				return null;
 			}
 			PhpIndex phpIndex = PhpIndex.getInstance(el.getProject());
-			Collection<PhpClass> classes = PhpIndexUtil.getClasses(ref.getClassReference().getType(), phpIndex);
+			Collection<PhpClass> classes = ClassFinder.getFromMemberReference(ref);
 			if (classes.size() > 0) {
 				return classes.iterator().next().findFieldByName(ref.getName(), false);
 			}

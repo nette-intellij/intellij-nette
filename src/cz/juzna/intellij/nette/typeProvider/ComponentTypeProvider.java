@@ -8,8 +8,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			}
 			Method m = cls.findMethodByName(method);
 			if (m != null) {
-				result.addAll(PhpIndexUtil.getClasses(m.getType(), PhpIndex.getInstance(project)));
+				result.addAll(ClassFinder.getFromTypedElement(m));
 			}
 		}
 		return result;

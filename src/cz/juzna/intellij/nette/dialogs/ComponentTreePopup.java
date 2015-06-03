@@ -6,7 +6,6 @@ import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.MnemonicHelper;
-import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -16,11 +15,10 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.tree.TreeUtil;
-import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
-import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +41,7 @@ public class ComponentTreePopup {
 		this.editor = editor;
 	}
 
-	public void show()
-	{
+	public void show() {
 		PsiTreeElementBase<PsiElement> root = new ComponentTreeElement(cls);
 		final StructureViewComponent structureView = new StructureViewComponent(fileEditor, new StructureViewModelBase(cls.getContainingFile(), editor, root), cls.getProject(), true);
 		structureView.setFocusable(true);
@@ -83,7 +80,7 @@ public class ComponentTreePopup {
 										if (!popup.isDisposed()) {
 											TreeUtil.ensureSelection(structureView.getTree());
 											IdeFocusManager.getInstance(cls.getProject()).requestFocus(structureView.getTree(), true);
-											for (int i = 1; i <=structureView.getTree().getRowCount(); i++ ) {
+											for (int i = 1; i <= structureView.getTree().getRowCount(); i++) {
 												structureView.getTree().collapseRow(i);
 											}
 										}
@@ -122,7 +119,7 @@ public class ComponentTreePopup {
 				}
 			} else if (getElement() instanceof Method) {
 				Method method = (Method) getElement();
-				for (PhpClass cls : PhpIndexUtil.getClasses(method.getType(), PhpIndex.getInstance(method.getProject()))) {
+				for (PhpClass cls : ClassFinder.getFromTypedElement(method)) {
 					children.add(new ComponentTreeElement(cls, false));
 					for (Method m : ComponentUtil.getFactoryMethods(cls, null)) {
 						children.add(new ComponentTreeElement(m));
