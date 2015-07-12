@@ -11,11 +11,9 @@ import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
 import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.regex.Pattern;
 
 
 public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
@@ -45,8 +43,12 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 			return null;
 		}
 		visited.add(field);
-		Collection<Method> getters = MagicFieldsUtil.findGetters(field);
-		visited.remove(field);
+		Collection<Method> getters;
+		try {
+			getters = MagicFieldsUtil.findGetters(field);
+		} finally {
+			visited.remove(field);
+		}
 		if (getters.isEmpty()) {
 			return null;
 		}
