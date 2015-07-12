@@ -6,15 +6,20 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import com.jetbrains.php.PhpIndex;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocComment;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.Field;
 import com.jetbrains.php.lang.psi.elements.GroupStatement;
+import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpPsiElement;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import org.jetbrains.annotations.NotNull;
 
 public class PhpDocCompletionContributor extends CompletionContributor {
+
+	private static PhpType presenterComponent = new PhpType().add("Nette\\Application\\UI\\PresenterComponent");
 
 	public PhpDocCompletionContributor() {
 		this.extend(CompletionType.BASIC, PlatformPatterns.or(
@@ -44,6 +49,10 @@ public class PhpDocCompletionContributor extends CompletionContributor {
 			}
 			if (field.getModifier().isPublic()) {
 				result.addElement(LookupElementBuilder.create("inject").withBoldness(true));
+				PhpClass cls = field.getContainingClass();
+				if (cls != null && presenterComponent.isConvertibleFrom(cls.getType(), PhpIndex.getInstance(field.getProject()))) {
+					result.addElement(LookupElementBuilder.create("persistent").withBoldness(true));
+				}
 			}
 		}
 	}
