@@ -1,11 +1,7 @@
 package cz.juzna.intellij.nette.utils;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.HashMap;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.completion.PhpVariantsUtil;
-import com.jetbrains.php.completion.UsageContext;
 import com.jetbrains.php.lang.psi.PhpPsiUtil;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
@@ -65,15 +61,9 @@ public class MagicFieldsUtil {
 			if (method == null) {
 				continue;
 			}
-			ArrayList<PhpNamedElement> elements = new ArrayList<PhpNamedElement>();
-//			elements.add(method); //todo: probably causes recursion, find better way to check visibility
 			Field field = cls.findFieldByName(fieldReference.getName(), false);
-			if (field != null) {
-				elements.add(field);
-			}
-			Collection<String> accessible = findAccessibleMembers(cls, fieldReference, elements);
-
-			if (!accessible.contains(fieldReference.getName())/* && accessible.contains(method.getName())*/) {
+			PhpClass containingClass = PhpPsiUtil.getParentByCondition(fieldReference, PhpClass.INSTANCEOF);
+			if ((field == null || !isAccessible(field, containingClass)) && isAccessible(method, containingClass)) {
 				methods.add(method);
 			}
 		}
@@ -85,12 +75,17 @@ public class MagicFieldsUtil {
 
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
 		Map<String, PhpClass> classesInFile = cz.juzna.intellij.nette.utils.PhpPsiUtil.getClassesInFile(reference);
+		PhpClass containingClass = PhpPsiUtil.getParentByCondition(reference, PhpClass.INSTANCEOF);
 		for (PhpClass cls : ClassFinder.getFromMemberReference(reference)) {
 			if (!isNetteObject(cls, classesInFile)) {
 				continue;
 			}
-			Collection<String> accessibleFields = null;
-			for (Method method : cls.getMethods()) {
+			Collection<Method> methods = cls.getMethods();
+			if (methods.isEmpty()) {
+				continue;
+			}
+			Collection<Field> classFields = null;
+			for (Method method : methods) {
 				String name = method.getName();
 				String fieldName;
 				if (name.startsWith("get") && name.length() > 3) {
@@ -102,10 +97,25 @@ public class MagicFieldsUtil {
 				} else {
 					continue;
 				}
-				if (accessibleFields == null) {
-					accessibleFields = findAccessibleFields(cls, reference);
+				if (!isAccessible(method, containingClass)) {
+					continue;
 				}
-				if (accessibleFields.contains(fieldName)) {
+				if (classFields == null) {
+					classFields = cls.getFields();
+				}
+				boolean isFieldAccessible = false;
+				for (Field field : classFields) {
+					if (!field.getName().equals(fieldName)) {
+						continue;
+					}
+					if (isAccessible(field, containingClass)) {
+						isFieldAccessible = true;
+					} else {
+						isFieldAccessible = false;
+						break; //there is at least one not accessible field
+					}
+				}
+				if (isFieldAccessible) {
 					continue;
 				}
 
@@ -122,28 +132,6 @@ public class MagicFieldsUtil {
 		return fields;
 	}
 
-	private static Collection<String> findAccessibleFields(PhpClass cls, MemberReference reference) {
-		return findAccessibleMembers(cls, reference, cls.getFields());
-	}
-
-	private static Collection<String> findAccessibleMembers(PhpClass cls, MemberReference reference, Collection<? extends PhpNamedElement> elements) {
-
-		PhpClass containingClass = PhpPsiUtil.getParentByCondition(reference, PhpClass.INSTANCEOF);
-		Collection<String> members = new ArrayList<String>();
-		UsageContext usageContext = new UsageContext(PhpModifier.State.PARENT);
-		usageContext.setTargetObjectClass(cls);
-		if (containingClass != null) {
-			usageContext.setClassForAccessFilter(containingClass);
-		}
-
-		for (LookupElement el : PhpVariantsUtil.getLookupItems(elements, false, usageContext)) {
-			PsiElement psiEl = el.getPsiElement();
-			if (psiEl instanceof PhpNamedElement) {
-				members.add(((PhpNamedElement) psiEl).getName());
-			}
-		}
-		return members;
-	}
 
 	@NotNull
 	public static HashMap<String, Field> findEventFields(PhpType type, PhpIndex phpIndex) {
@@ -164,6 +152,44 @@ public class MagicFieldsUtil {
 
 	private static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
 		return cz.juzna.intellij.nette.utils.PhpPsiUtil.isTypeOf(cls, "Nette\\Object", classMap);
+	}
+
+	private static boolean isAccessible(PhpClassMember member, @Nullable PhpClass accessClass) {
+		PhpClass elementClass = member.getContainingClass();
+		if (classesEqual(elementClass, accessClass)) {
+			return true;
+		}
+		PhpModifier modifier = member.getModifier();
+		if (modifier.isPublic()) {
+			return true;
+		}
+		if (accessClass == null || elementClass == null) {
+			return false;
+		}
+		for (PhpClass contextClass = accessClass; contextClass != null; contextClass = contextClass.getSuperClass()) {
+			if (elementClass.isTrait()) {
+				for (PhpClass traitClass : contextClass.getTraits()) {
+					if (classesEqual(elementClass, traitClass)) {
+						return true;
+					}
+
+				}
+			} else if (classesEqual(elementClass, contextClass)) {
+				return true;
+			}
+			if (modifier.isPrivate()) {
+				break;
+			}
+		}
+
+		return false;
+	}
+
+
+	private static boolean classesEqual(@Nullable PhpClass one, @Nullable PhpClass another) {
+		return one != null && another != null
+				&& one.getFQN() != null && another.getFQN() != null
+				&& one.getFQN().equals(another.getFQN());
 	}
 
 }
