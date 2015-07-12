@@ -47,6 +47,7 @@
 						 groupName="Nette"
 						 implementationClass="cz.juzna.intellij.nette.inspections.CreateComponentReturnFormTypeInspection"
 						 level="WARNING" enabledByDefault="true"/>
+		<predefinedCodeStyle implementation="cz.juzna.intellij.nette.codeStyle.NetteCodeStyle"/>
 	</extensions>
 
 	<actions>
