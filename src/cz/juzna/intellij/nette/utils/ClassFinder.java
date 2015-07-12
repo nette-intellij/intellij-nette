@@ -80,7 +80,7 @@ public class ClassFinder {
 		if (type.isEmpty() || type.toString().trim().equals("")) {
 			return Collections.emptyList();
 		}
-		ClassFinder finder = new ClassFinder(PhpIndex.getInstance(((PsiElement) el).getProject()));
+		ClassFinder finder = new ClassFinder(PhpIndex.getInstance(((PsiElement) el).getProject()), PhpPsiUtil.getClassesInFile((PsiElement) el));
 
 		return finder.find(el.getType());
 	}
