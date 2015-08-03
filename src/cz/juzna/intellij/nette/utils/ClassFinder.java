@@ -44,7 +44,7 @@ public class ClassFinder {
 			} else if (className.startsWith("#")) {
 				if (visited.contains(className)) {
 
-				} else if (PhpTypeSignatureKey.CLASS.is(className.charAt(2)) && !classesInFile.containsKey(className.substring(2))) {
+				} else if (className.length() > 3 && PhpTypeSignatureKey.CLASS.is(className.charAt(2)) && !classesInFile.containsKey(className.substring(2))) {
 					classes.add(classesInFile.get(className.substring(2)));
 				} else {
 					visited.add(className);
