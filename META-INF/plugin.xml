@@ -1,9 +1,13 @@
 <idea-plugin version="2">
 	<name>Nette framework helpers</name>
 	<description>Nette development with pleasure</description>
-	<version>0.3.0</version>
+	<version>0.3.1</version>
 	<vendor>juzna.cz</vendor>
 	<change-notes><![CDATA[
+	<h2>0.3.1</h2>
+	<ul>
+	    <li>Fixed StringIndexOutOfBoundsException exception in ClassFinder</li>
+	</ul>
 	<h2>0.3.0</h2>
 	<ul>
 		<li>Added component tree popup</li>
