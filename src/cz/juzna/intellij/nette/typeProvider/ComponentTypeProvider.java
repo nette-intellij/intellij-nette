@@ -4,19 +4,28 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.Method;
+import com.jetbrains.php.lang.psi.elements.ArrayAccessExpression;
+import com.jetbrains.php.lang.psi.elements.ArrayIndex;
+import com.jetbrains.php.lang.psi.elements.MethodReference;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
+import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
+import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
-import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.ElementValueResolver;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
+import cz.juzna.intellij.nette.utils.PhpPsiUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 
 public class ComponentTypeProvider implements PhpTypeProvider2 {
+
+	final static String SEPARATOR = "\u0180";
 
 	@Override
 	public char getKey() {
@@ -29,30 +38,50 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 		if (DumbService.getInstance(el.getProject()).isDumb()) {
 			return null;
 		}
-		for (Method method : ComponentUtil.getFactoryMethods(el, true)) {
-			if (method.getContainingClass() != null) {
-				return method.getContainingClass().getFQN() + "." + method.getName();
+		String componentName;
+		PhpType type;
+		if (el instanceof ArrayAccessExpression) {
+			if (PhpPsiUtil.isLocallyResolvableType(el)) {
+				return null;
 			}
+			ArrayIndex index = ((ArrayAccessExpression) el).getIndex();
+			if (index == null || !(el.getFirstChild() instanceof PhpTypedElement)) {
+				return null;
+			}
+			componentName = ElementValueResolver.resolve(index.getValue());
+			type = ((PhpTypedElement) el.getFirstChild()).getType();
+		} else if (el instanceof MethodReference) {
+			MethodReference methodRef = (MethodReference) el;
+			if (methodRef.getClassReference() == null
+					|| methodRef.getName() == null
+					|| !methodRef.getName().equals("getComponent")
+					|| methodRef.getParameters().length != 1) {
+				return null;
+			}
+			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
+			type = methodRef.getClassReference().getType();
+		} else {
+			return null;
 		}
-		return null;
+
+		return componentName + SEPARATOR + type.toString();
 	}
 
 	@Override
 	public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
 
-		int dot = s.lastIndexOf('.');
-		String method = s.substring(dot + 1);
-
-		Collection<PhpClass> classes = PhpIndex.getInstance(project).getAnyByFQN(s.substring(0, dot));
+		String[] parts = s.split(SEPARATOR, 2);
+		if (parts.length != 2) {
+			return Collections.emptyList();
+		}
+		String componentName = parts[0];
+		Collection<PhpClass> classes = PhpIndexUtil.getByType(parts[1].split("\\|"), PhpIndex.getInstance(project));
 		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
 		for (PhpClass cls : classes) {
-			if (!ComponentUtil.isContainer(cls) && !cls.isTrait()) {
+			if (!ComponentUtil.isContainer(cls)) {
 				continue;
 			}
-			Method m = cls.findMethodByName(method);
-			if (m != null) {
-				result.addAll(ClassFinder.getFromTypedElement(m));
-			}
+			result.addAll(ComponentUtil.getFactoryMethodsByName(cls, componentName, false));
 		}
 		return result;
 	}

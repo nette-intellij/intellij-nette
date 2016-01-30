@@ -62,7 +62,7 @@ public class ComponentUtil {
 			if (!isContainer(currentClass, classesInFile)) {
 				continue;
 			}
-			methods.addAll(getFactoryMethodsInternal(currentClass, onlyWithName ? componentName : null, false));
+			methods.addAll(getFactoryMethodsByName(currentClass, onlyWithName ? componentName : null, false));
 		}
 		Method[] result = new Method[methods.size()];
 
@@ -80,10 +80,10 @@ public class ComponentUtil {
 			return Collections.emptyList();
 		}
 
-		return getFactoryMethodsInternal(cls, componentName, onlyOwn);
+		return getFactoryMethodsByName(cls, componentName, onlyOwn);
 	}
 
-	private static Collection<Method> getFactoryMethodsInternal(@NotNull PhpClass cls, String componentName, boolean onlyOwn) {
+	public static Collection<Method> getFactoryMethodsByName(@NotNull PhpClass cls, String componentName, boolean onlyOwn) {
 		Collection<Method> methods = new ArrayList<Method>();
 		if (componentName != null) {
 			String method = factoryMethodPrefix + StringUtil.upperFirst(componentName);
