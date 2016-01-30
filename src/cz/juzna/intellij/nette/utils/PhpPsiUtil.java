@@ -4,6 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.jetbrains.php.lang.psi.PhpExpressionCodeFragment;
 import com.jetbrains.php.lang.psi.PhpFile;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeAnalyserVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class PhpPsiUtil {
 			if (typeEquals(typeFqn, fqn)) {
 				return true;
 			}
-			if (classMap.containsKey(fqn)) {
+			if (classMap != null && classMap.containsKey(fqn)) {
 				cls = classMap.get(cls.getSuperFQN());
 			} else {
 				cls = cls.getSuperClass();
@@ -59,6 +60,17 @@ public class PhpPsiUtil {
 		}
 
 		return type1.equals(type2);
+	}
+
+	public static boolean isLocallyResolvableType(PsiElement e) {
+		PhpTypeAnalyserVisitor analyserVisitor = new PhpTypeAnalyserVisitor(0);
+		e.accept(analyserVisitor);
+		for (String type : analyserVisitor.getType().getTypes()) {
+			if (!type.equals("?") && !type.startsWith("#")) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

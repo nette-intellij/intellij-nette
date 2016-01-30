@@ -47,28 +47,6 @@ public class MagicFieldsUtil {
 		return fieldType;
 	}
 
-	public static Collection<Method> findGetters(FieldReference fieldReference) {
-		Map<String, PhpClass> classesInFile = cz.juzna.intellij.nette.utils.PhpPsiUtil.getClassesInFile(fieldReference);
-		Collection<Method> methods = new ArrayList<Method>();
-		for (PhpClass cls : ClassFinder.getFromMemberReference(fieldReference)) {
-			if (!isNetteObject(cls, classesInFile)) {
-				continue;
-			}
-			Method method = cls.findMethodByName("get" + StringUtil.upperFirst(fieldReference.getName()));
-			if (method == null) {
-				method = cls.findMethodByName("is" + StringUtil.upperFirst(fieldReference.getName()));
-			}
-			if (method == null) {
-				continue;
-			}
-			Field field = cls.findFieldByName(fieldReference.getName(), false);
-			PhpClass containingClass = PhpPsiUtil.getParentByCondition(fieldReference, PhpClass.INSTANCEOF);
-			if ((field == null || !isAccessible(field, containingClass)) && isAccessible(method, containingClass)) {
-				methods.add(method);
-			}
-		}
-		return methods;
-	}
 
 	@NotNull
 	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference) {
@@ -149,12 +127,48 @@ public class MagicFieldsUtil {
 		return fields;
 	}
 
+	public static Collection<PhpNamedElement> findMagicMethods(@NotNull  String fieldName, @NotNull  Collection<PhpClass> containingClass, @Nullable  Collection<PhpClass> calledFrom)
+	{
+		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
 
-	private static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
+		for (PhpClass cls : containingClass) {
+			Field field = cls.findFieldByName(fieldName, false);
+			if (field != null && (!MagicFieldsUtil.isNetteObject(cls, null) || MagicFieldsUtil.isAccessible(field, calledFrom))) {
+				result.add(field);
+			} else {
+				for (String prefix : new String[]{"get", "is"}) {
+					String methodName = prefix + StringUtil.upperFirst(fieldName);
+					Method method = cls.findMethodByName(methodName);
+					if (method != null && MagicFieldsUtil.isAccessible(method, calledFrom)) {
+						result.add(method);
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+
+	public static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
 		return cz.juzna.intellij.nette.utils.PhpPsiUtil.isTypeOf(cls, "Nette\\Object", classMap);
 	}
 
-	private static boolean isAccessible(PhpClassMember member, @Nullable PhpClass accessClass) {
+	public static boolean isAccessible(PhpClassMember member, @Nullable Collection<PhpClass> accessClasses)
+	{
+		if (accessClasses == null) {
+			return isAccessible(member, (PhpClass) null);
+		}
+		for (PhpClass cls : accessClasses) {
+			if (isAccessible(member, cls)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isAccessible(PhpClassMember member, @Nullable PhpClass accessClass) {
 		PhpClass elementClass = member.getContainingClass();
 		if (classesEqual(elementClass, accessClass)) {
 			return true;

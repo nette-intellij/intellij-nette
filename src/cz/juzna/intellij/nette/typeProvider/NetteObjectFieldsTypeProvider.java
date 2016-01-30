@@ -4,22 +4,19 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.jetbrains.php.PhpIndex;
-import com.jetbrains.php.lang.psi.elements.FieldReference;
-import com.jetbrains.php.lang.psi.elements.Method;
-import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
+import com.jetbrains.php.lang.psi.PhpPsiUtil;
+import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
 import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 
 
 public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 	final static String SEPARATOR = "\u0180";
-
-	private Collection<FieldReference> visited = new HashSet<FieldReference>();
 
 	@Override
 	public char getKey() {
@@ -39,41 +36,34 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 		if (field.getClassReference() == null) {
 			return null;
 		}
-		if (visited.contains(field)) {
+		if (cz.juzna.intellij.nette.utils.PhpPsiUtil.isLocallyResolvableType(e)) {
 			return null;
-		}
-		visited.add(field);
-		Collection<Method> getters;
-		try {
-			getters = MagicFieldsUtil.findGetters(field);
-		} finally {
-			visited.remove(field);
-		}
-		if (getters.isEmpty()) {
-			return null;
-		}
-		StringBuilder signature = new StringBuilder();
-		for (Method method : getters) {
-			signature.append("#M#C").append(method.getContainingClass().getFQN()).append(".").append(method.getName()).append(SEPARATOR);
 		}
 
-		return signature.toString();
+
+		PhpClass calledFrom = PhpPsiUtil.getParentByCondition(field, PhpClass.INSTANCEOF);
+		return field.getName() + SEPARATOR + (calledFrom != null ? calledFrom.getFQN() : "") + SEPARATOR + field.getClassReference().getType().toString();
 	}
 
 	@Override
 	public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
 		PhpIndex index = PhpIndex.getInstance(project);
-		Collection<PhpNamedElement> elements = new ArrayList<PhpNamedElement>();
-		while (s.contains(SEPARATOR)) {
-			String sig = s.substring(0, s.indexOf(SEPARATOR));
-			s = s.substring(s.indexOf(SEPARATOR) + 1);
-			if (!sig.isEmpty()) {
-				elements.addAll(index.getBySignature(sig));
-			}
+		String[] parts = s.split(SEPARATOR, 3);
+		if (parts.length != 3) {
+			return Collections.emptyList();
 		}
+		String fieldName = parts[0];
+		String calledFromFqn = parts[1];
+		Collection<PhpClass> calledFrom = null;
+		if (!calledFromFqn.equals("")) {
+			calledFrom = index.getAnyByFQN(calledFromFqn);
+		}
+		String type = parts[2];
+		Collection<PhpClass> containingClass = PhpIndexUtil.getByType(type.split("\\|"), index);
 
-		return elements;
+		return MagicFieldsUtil.findMagicMethods(fieldName, containingClass, calledFrom);
 	}
+
 
 
 }
