@@ -16,7 +16,9 @@ import java.util.Collections;
 
 
 public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
+
 	final static String SEPARATOR = "\u0180";
+	final static String TYPE_SEPARATOR = "\u0181";
 
 	@Override
 	public char getKey() {
@@ -42,7 +44,8 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 
 
 		PhpClass calledFrom = PhpPsiUtil.getParentByCondition(field, PhpClass.INSTANCEOF);
-		return field.getName() + SEPARATOR + (calledFrom != null ? calledFrom.getFQN() : "") + SEPARATOR + field.getClassReference().getType().toString();
+		String typeString = field.getClassReference().getType().toString().replaceAll("\\|", TYPE_SEPARATOR);
+		return field.getName() + SEPARATOR + (calledFrom != null ? calledFrom.getFQN() : "") + SEPARATOR + typeString;
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 			calledFrom = index.getAnyByFQN(calledFromFqn);
 		}
 		String type = parts[2];
-		Collection<PhpClass> containingClass = PhpIndexUtil.getByType(type.split("\\|"), index);
+		Collection<PhpClass> containingClass = PhpIndexUtil.getByType(type.split(TYPE_SEPARATOR), index);
 
 		return MagicFieldsUtil.findMagicMethods(fieldName, containingClass, calledFrom);
 	}

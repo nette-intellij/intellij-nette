@@ -26,6 +26,7 @@ import java.util.Collections;
 public class ComponentTypeProvider implements PhpTypeProvider2 {
 
 	final static String SEPARATOR = "\u0180";
+	final static String TYPE_SEPARATOR = "\u0181";
 
 	@Override
 	public char getKey() {
@@ -64,7 +65,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			return null;
 		}
 
-		return componentName + SEPARATOR + type.toString();
+		return componentName + SEPARATOR + type.toString().replaceAll("\\|", TYPE_SEPARATOR);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			return Collections.emptyList();
 		}
 		String componentName = parts[0];
-		Collection<PhpClass> classes = PhpIndexUtil.getByType(parts[1].split("\\|"), PhpIndex.getInstance(project));
+		Collection<PhpClass> classes = PhpIndexUtil.getByType(parts[1].split(TYPE_SEPARATOR), PhpIndex.getInstance(project));
 		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
 		for (PhpClass cls : classes) {
 			if (!ComponentUtil.isContainer(cls)) {
