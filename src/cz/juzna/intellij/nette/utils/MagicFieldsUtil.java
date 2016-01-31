@@ -10,9 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 public class MagicFieldsUtil {
+
+	private static PhpType netteObject = new PhpType().add("Nette\\Object");
 
 	@Nullable
 	public static PhpType extractTypeFromMethodTypes(@NotNull Collection<Method> types) {
@@ -52,10 +53,9 @@ public class MagicFieldsUtil {
 	public static HashMap<String, Collection<Method>> findMagicFields(MemberReference reference) {
 
 		HashMap<String, Collection<Method>> fields = new HashMap<String, Collection<Method>>();
-		Map<String, PhpClass> classesInFile = cz.juzna.intellij.nette.utils.PhpPsiUtil.getClassesInFile(reference);
 		PhpClass containingClass = PhpPsiUtil.getParentByCondition(reference, PhpClass.INSTANCEOF);
-		for (PhpClass cls : ClassFinder.getFromMemberReference(reference)) {
-			if (!isNetteObject(cls, classesInFile)) {
+		for (PhpClass cls : PhpIndexUtil.getClasses(reference.getClassReference(), reference.getProject())) {
+			if (!isNetteObject(cls)) {
 				continue;
 			}
 			Collection<Method> methods = cls.getMethods();
@@ -114,7 +114,7 @@ public class MagicFieldsUtil {
 	@NotNull
 	public static HashMap<String, Field> findEventFields(PhpType type, PhpIndex phpIndex) {
 		HashMap<String, Field> fields = new HashMap<String, Field>();
-		for (PhpClass cls : ClassFinder.getClasses(type, phpIndex)) {
+		for (PhpClass cls : PhpIndexUtil.getByType(type, phpIndex)) {
 			for (Field field : cls.getFields()) {
 				String name = field.getName();
 				if (name.length() <= 2 || !name.startsWith("on")) { // we want only "onEvent"
@@ -133,7 +133,7 @@ public class MagicFieldsUtil {
 
 		for (PhpClass cls : containingClass) {
 			Field field = cls.findFieldByName(fieldName, false);
-			if (field != null && (!MagicFieldsUtil.isNetteObject(cls, null) || MagicFieldsUtil.isAccessible(field, calledFrom))) {
+			if (field != null && (!MagicFieldsUtil.isNetteObject(cls) || MagicFieldsUtil.isAccessible(field, calledFrom))) {
 				result.add(field);
 			} else {
 				for (String prefix : new String[]{"get", "is"}) {
@@ -148,11 +148,6 @@ public class MagicFieldsUtil {
 		}
 
 		return result;
-	}
-
-
-	public static boolean isNetteObject(PhpClass cls, Map<String, PhpClass> classMap) {
-		return cz.juzna.intellij.nette.utils.PhpPsiUtil.isTypeOf(cls, "Nette\\Object", classMap);
 	}
 
 	public static boolean isAccessible(PhpClassMember member, @Nullable Collection<PhpClass> accessClasses)
@@ -199,10 +194,12 @@ public class MagicFieldsUtil {
 		return false;
 	}
 
+	private static boolean isNetteObject(PhpClass cls) {
+		return netteObject.isConvertibleFrom(cls.getType(), PhpIndex.getInstance(cls.getProject()));
+	}
 
 	private static boolean classesEqual(@Nullable PhpClass one, @Nullable PhpClass another) {
 		return one != null && another != null
-				&& one.getFQN() != null && another.getFQN() != null
 				&& one.getFQN().equals(another.getFQN());
 	}
 

@@ -20,7 +20,6 @@ public class PhpIndexUtil {
 	}
 
 	private static Collection<PhpClass> getBySignature(String sig, PhpIndex phpIndex) {
-
 		Collection<PhpClass> classes = new ArrayList<PhpClass>();
 		for (PhpNamedElement el : phpIndex.getBySignature(sig)) {
 			classes.addAll(getByType(el.getType(), phpIndex));
@@ -29,7 +28,7 @@ public class PhpIndexUtil {
 		return classes;
 	}
 
-	private static Collection<PhpClass> getByType(PhpType type, PhpIndex phpIndex) {
+	public static Collection<PhpClass> getByType(PhpType type, PhpIndex phpIndex) {
 		Set<String> types = type.getTypes();
 		return getByType(types.toArray(new String[types.size()]), phpIndex);
 	}

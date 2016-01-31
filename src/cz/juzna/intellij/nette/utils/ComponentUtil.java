@@ -22,10 +22,6 @@ public class ComponentUtil {
 		return container.isConvertibleFrom(csl.getType(), PhpIndex.getInstance(csl.getProject()));
 	}
 
-	public static boolean isContainer(PhpClass cls, Map<String, PhpClass> classMap) {
-		return PhpPsiUtil.isTypeOf(cls, "Nette\\ComponentModel\\Container", classMap);
-	}
-
 	@NotNull
 	public static Method[] getFactoryMethods(PsiElement el) {
 		return getFactoryMethods(el, false);
@@ -41,7 +37,7 @@ public class ComponentUtil {
 				return new Method[0];
 			}
 			componentName = ElementValueResolver.resolve(index.getValue());
-			classes = ClassFinder.getFromTypedElement((PhpTypedElement) el.getFirstChild());
+			classes = PhpIndexUtil.getClasses((PhpTypedElement) el.getFirstChild(), el.getProject());
 		} else if (el instanceof MethodReference) {
 			MethodReference methodRef = (MethodReference) el;
 			if (methodRef.getClassReference() == null
@@ -51,15 +47,14 @@ public class ComponentUtil {
 				return new Method[0];
 			}
 			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
-			classes = ClassFinder.getFromMemberReference(methodRef);
+			classes = PhpIndexUtil.getClasses(methodRef.getClassReference(), methodRef.getProject());
 		}
 		if (classes == null || classes.isEmpty() || (componentName == null && onlyWithName)) {
 			return new Method[0];
 		}
 		Collection<Method> methods = new ArrayList<Method>();
-		Map<String, PhpClass> classesInFile = PhpPsiUtil.getClassesInFile(el);
 		for (PhpClass currentClass : classes) {
-			if (!isContainer(currentClass, classesInFile)) {
+			if (!isContainer(currentClass)) {
 				continue;
 			}
 			methods.addAll(getFactoryMethodsByName(currentClass, onlyWithName ? componentName : null, false));

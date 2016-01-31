@@ -20,7 +20,7 @@ public class EventUtil {
 			return Collections.emptyList();
 		}
 		Collection<Field> fields = new ArrayList<Field>();
-		for (PhpClass cls : ClassFinder.getFromMemberReference(methodReference)) {
+		for (PhpClass cls : PhpIndexUtil.getClasses(methodReference.getClassReference(), methodReference.getProject())) {
 			Method method = cls.findMethodByName(eventName);
 			if (method == null || method instanceof PhpDocMethod) {
 				fields.add(cls.findFieldByName(eventName, false));

@@ -17,8 +17,8 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
-import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,7 +119,7 @@ public class ComponentTreePopup {
 				}
 			} else if (getElement() instanceof Method) {
 				Method method = (Method) getElement();
-				for (PhpClass cls : ClassFinder.getFromTypedElement(method)) {
+				for (PhpClass cls : PhpIndexUtil.getClasses(method, method.getProject())) {
 					children.add(new ComponentTreeElement(cls, false));
 					for (Method m : ComponentUtil.getFactoryMethods(cls, null)) {
 						children.add(new ComponentTreeElement(m));

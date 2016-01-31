@@ -9,8 +9,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import cz.juzna.intellij.nette.utils.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +32,7 @@ public class ComponentCompletionContributor extends CompletionContributor {
 				String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
 				LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
 				PhpType returnType = new PhpType();
-				for (PhpClass typeCls : ClassFinder.getFromTypedElement(method)) {
+				for (PhpClass typeCls : PhpIndexUtil.getClasses(method, method.getProject())) {
 					returnType.add(typeCls.getType());
 				}
 				lookupElement = lookupElement.withTypeText(returnType.toString()); //TODO: use toStringRelativized

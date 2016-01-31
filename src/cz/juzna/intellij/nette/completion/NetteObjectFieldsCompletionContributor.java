@@ -17,8 +17,8 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.stubs.indexes.PhpFieldIndex;
-import cz.juzna.intellij.nette.utils.ClassFinder;
 import cz.juzna.intellij.nette.utils.MagicFieldsUtil;
+import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -88,7 +88,7 @@ public class NetteObjectFieldsCompletionContributor extends CompletionContributo
 
 			HashMap<String, Field> eventFields = MagicFieldsUtil.findEventFields(type, phpIndex);
 			Set<String> classMethods = new HashSet<String>();
-			for (PhpClass cls : ClassFinder.getFromMemberReference((MemberReference) position)) {
+			for (PhpClass cls : PhpIndexUtil.getClasses(((MemberReference) position).getClassReference(), position.getProject())) {
 				for (Method method : cls.getMethods()) {
 					classMethods.add(method.getName());
 				}
