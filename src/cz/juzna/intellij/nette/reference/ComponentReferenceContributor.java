@@ -4,9 +4,11 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.php.lang.parser.PhpElementTypes;
-import com.jetbrains.php.lang.psi.elements.Method;
-import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class ComponentReferenceContributor extends PsiReferenceContributor {
 
@@ -19,11 +21,19 @@ public class ComponentReferenceContributor extends PsiReferenceContributor {
 				if (psiElement.getParent() == null || psiElement.getParent().getParent() == null) {
 					return new PsiReference[0];
 				}
-				Method[] factoryMethods = ComponentUtil.getFactoryMethods(psiElement.getParent().getParent(), true);
-				if (factoryMethods.length == 0) {
+				PsiElement el = psiElement.getParent().getParent();
+				ComponentSearcher.ComponentQuery query = ComponentSearcher.createQuery(el);
+				query.withPath();
+				Collection<ComponentSearcher.ComponentSearchResult> result = ComponentSearcher.find(query);
+				if (result.size() == 0) {
 					return new PsiReference[0];
 				}
-				return new PsiReference[]{new ComponentReference(psiElement)};
+				Collection<PsiReference> refs = new ArrayList<PsiReference>(result.size());
+				for (ComponentSearcher.ComponentSearchResult searchResult : result) {
+					refs.add(new ComponentReference(psiElement, searchResult.getPath()));
+				}
+
+				return refs.toArray(new PsiReference[refs.size()]);
 			}
 		});
 	}

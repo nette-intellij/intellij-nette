@@ -12,13 +12,12 @@ import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
 import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider2;
-import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import cz.juzna.intellij.nette.utils.ElementValueResolver;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import cz.juzna.intellij.nette.utils.PhpPsiUtil;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -77,14 +76,8 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 		}
 		String componentName = parts[0];
 		Collection<PhpClass> classes = PhpIndexUtil.getByType(parts[1].split(TYPE_SEPARATOR), PhpIndex.getInstance(project));
-		Collection<PhpNamedElement> result = new ArrayList<PhpNamedElement>();
-		for (PhpClass cls : classes) {
-			if (!ComponentUtil.isContainer(cls)) {
-				continue;
-			}
-			result.addAll(ComponentUtil.getFactoryMethodsByName(cls, componentName, false));
-		}
-		return result;
+		return ComponentSearcher.findMethods(new ComponentSearcher.ComponentQuery(componentName, classes));
+
 	}
 
 }

@@ -15,7 +15,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpReturn;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import cz.juzna.intellij.nette.utils.ComponentUtil;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +49,10 @@ public class CreateComponentReturnFormTypeInspection extends LocalInspectionTool
 		Collection<PhpClass> classes = PhpPsiUtil.findAllClasses((PhpFile) file);
 		Collection<Method> invalidReturnForms = new ArrayList<Method>();
 		for (PhpClass cls : classes) {
-			for (final Method method : ComponentUtil.getFactoryMethods(cls, null, true)) {
+
+			ComponentSearcher.ComponentQuery query = new ComponentSearcher.ComponentQuery(cls);
+			query.filterOwn();
+			for (final Method method : ComponentSearcher.findMethods(query)) {
 				InvalidCreateComponentMethodVisitor visitor = new InvalidCreateComponentMethodVisitor();
 				method.accept(visitor);
 				if (visitor.isInvalid()) {

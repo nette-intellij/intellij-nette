@@ -17,6 +17,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
 import org.jetbrains.annotations.NotNull;
@@ -114,14 +115,16 @@ public class ComponentTreePopup {
 		public Collection<StructureViewTreeElement> getChildrenBase() {
 			Collection<StructureViewTreeElement> children = new ArrayList<StructureViewTreeElement>();
 			if (expandClass && getElement() instanceof PhpClass) {
-				for (Method method : ComponentUtil.getFactoryMethods((PhpClass) getElement(), null)) {
+				ComponentSearcher.ComponentQuery query = new ComponentSearcher.ComponentQuery((PhpClass) getElement());
+				for (Method method : ComponentSearcher.findMethods(query)) {
 					children.add(new ComponentTreeElement(method));
 				}
 			} else if (getElement() instanceof Method) {
 				Method method = (Method) getElement();
 				for (PhpClass cls : PhpIndexUtil.getClasses(method, method.getProject())) {
 					children.add(new ComponentTreeElement(cls, false));
-					for (Method m : ComponentUtil.getFactoryMethods(cls, null)) {
+					ComponentSearcher.ComponentQuery query = new ComponentSearcher.ComponentQuery(cls);
+					for (Method m : ComponentSearcher.findMethods(query)) {
 						children.add(new ComponentTreeElement(m));
 					}
 				}

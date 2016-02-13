@@ -10,9 +10,8 @@ import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
-
-import java.util.Arrays;
 
 
 public class ComponentReferenceSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
@@ -36,9 +35,13 @@ public class ComponentReferenceSearch extends QueryExecutorBase<PsiReference, Re
 							return true;
 						}
 						PsiElement el = psiElement.getParent().getParent();
-						Method[] methods = ComponentUtil.getFactoryMethods(el);
-						if (Arrays.asList(methods).contains(method)) {
-							processor.process(new ComponentReference(psiElement));
+						ComponentSearcher.ComponentQuery query = ComponentSearcher.createQuery(el);
+						query.withPath();
+						for (ComponentSearcher.ComponentSearchResult result : ComponentSearcher.find(query)) {
+							if (result.getMethod() == method) {
+								processor.process(new ComponentReference(psiElement, result.getPath()));
+							}
+
 						}
 
 						return true;

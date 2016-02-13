@@ -9,9 +9,10 @@ import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.StringLiteralExpression;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
+import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import cz.juzna.intellij.nette.utils.ComponentUtil;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
-import cz.juzna.intellij.nette.utils.StringUtil;
+import cz.juzna.intellij.nette.utils.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ComponentCompletionContributor extends CompletionContributor {
@@ -24,13 +25,24 @@ public class ComponentCompletionContributor extends CompletionContributor {
 
 		@Override
 		protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-			PsiElement position = parameters.getPosition().getOriginalElement().getParent();
-			if (position.getParent() == null || position.getParent().getParent() == null) {
+			PsiElement position = parameters.getOriginalPosition();
+			position = PsiUtil.getParentAtLevel(position, 3);
+			if (position == null) {
 				return;
 			}
-			for (Method method : ComponentUtil.getFactoryMethods(position.getParent().getParent())) {
-				String componentName = StringUtil.lowerFirst(method.getName().substring("createComponent".length()));
-				LookupElementBuilder lookupElement = LookupElementBuilder.create(componentName);
+			ComponentSearcher.ComponentQuery query = ComponentSearcher.createQuery(position);
+			query.match(ComponentSearcher.Match.PREFIX);
+			String prefix = result.getPrefixMatcher().getPrefix();
+			if (prefix.contains("-")) {
+				prefix = prefix.substring(0, prefix.lastIndexOf("-") + 1);
+			} else {
+				prefix = "";
+			}
+			for (Method method : ComponentSearcher.findMethods(query)) {
+				String componentName = ComponentUtil.methodToComponentName(method.getName());
+
+				LookupElementBuilder lookupElement = LookupElementBuilder.create(prefix + componentName)
+						.withPresentableText(componentName);
 				PhpType returnType = new PhpType();
 				for (PhpClass typeCls : PhpIndexUtil.getClasses(method, method.getProject())) {
 					returnType.add(typeCls.getType());
