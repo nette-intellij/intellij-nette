@@ -135,7 +135,7 @@ public class MagicFieldsUtil {
 			Field field = cls.findFieldByName(fieldName, false);
 			if (field != null && (!MagicFieldsUtil.isNetteObject(cls) || MagicFieldsUtil.isAccessible(field, calledFrom))) {
 				result.add(field);
-			} else {
+			} else if (MagicFieldsUtil.isNetteObject(cls)) {
 				for (String prefix : new String[]{"get", "is"}) {
 					String methodName = prefix + StringUtil.upperFirst(fieldName);
 					Method method = cls.findMethodByName(methodName);
