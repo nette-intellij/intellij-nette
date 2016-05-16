@@ -17,8 +17,8 @@ import java.util.Collections;
 
 public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 
-	final static String SEPARATOR = "\u0180";
-	final static String TYPE_SEPARATOR = "\u0181";
+	private final static String SEPARATOR = "\u0180";
+	private final static String TYPE_SEPARATOR = "\u0181";
 
 	@Override
 	public char getKey() {
@@ -44,14 +44,16 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 
 
 		PhpClass calledFrom = PhpPsiUtil.getParentByCondition(field, PhpClass.INSTANCEOF);
-		String typeString = field.getClassReference().getType().toString().replaceAll("\\|", TYPE_SEPARATOR);
+		String typeString = field.getClassReference().getType().toString()
+				.replace(TYPE_SEPARATOR, "\\" + TYPE_SEPARATOR)
+				.replace("|", TYPE_SEPARATOR);
 		return field.getName() + SEPARATOR + (calledFrom != null ? calledFrom.getFQN() : "") + SEPARATOR + typeString;
 	}
 
 	@Override
 	public Collection<? extends PhpNamedElement> getBySignature(String s, Project project) {
 		PhpIndex index = PhpIndex.getInstance(project);
-		String[] parts = s.split(SEPARATOR, 3);
+		String[] parts = s.split(SEPARATOR + "", 3);
 		if (parts.length != 3) {
 			return Collections.emptyList();
 		}
@@ -62,7 +64,13 @@ public class NetteObjectFieldsTypeProvider implements PhpTypeProvider2 {
 			calledFrom = index.getAnyByFQN(calledFromFqn);
 		}
 		String type = parts[2];
-		Collection<PhpClass> containingClass = PhpIndexUtil.getByType(type.split(TYPE_SEPARATOR), index);
+		String[] types = type.split("(?<!\\\\)" + TYPE_SEPARATOR);
+		String[] resultTypes = new String[types.length];
+		int i = 0;
+		for (String str : types) {
+			resultTypes[i++] = str.replace("\\" + TYPE_SEPARATOR, TYPE_SEPARATOR);
+		}
+		Collection<PhpClass> containingClass = PhpIndexUtil.getByType(resultTypes, index);
 
 		return MagicFieldsUtil.findMagicMethods(fieldName, containingClass, calledFrom);
 	}
