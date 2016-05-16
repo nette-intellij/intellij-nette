@@ -1,9 +1,15 @@
 <idea-plugin version="2">
 	<name>Nette framework helpers</name>
 	<description>Nette development with pleasure</description>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
 	<vendor>juzna.cz</vendor>
 	<change-notes><![CDATA[
+	<h2>0.4.1</h2>
+	<ul>
+		<li>Fixed RuntimeException Invalid Signature</li>
+		<li>Fixed StackOverflowException</li>
+		<li>Fixed: find magic methods only in the Nette Object</li>
+	</ul>
 	<h2>0.4.0</h2>
 	<ul>
 		<li>Fixed deadlocks</li>
