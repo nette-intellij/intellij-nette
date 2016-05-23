@@ -25,6 +25,7 @@ public class NetteCodeStyle extends PhpLanguageCodeStyleSettingsProvider.PSR1PSR
 		CommonCodeStyleSettings commonSettings = settings.getCommonSettings(this.getLanguage());
 		commonSettings.BLANK_LINES_AFTER_CLASS_HEADER = 0;
 		commonSettings.ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION = false;
+		commonSettings.SPACE_AFTER_TYPE_CAST = true;
 
 		PhpCodeStyleSettings phpSettings = settings.getCustomSettings(PhpCodeStyleSettings.class);
 		phpSettings.PHPDOC_BLANK_LINE_BEFORE_TAGS = false;
