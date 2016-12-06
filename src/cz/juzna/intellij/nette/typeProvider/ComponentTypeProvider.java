@@ -48,7 +48,7 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 			if (index == null || !(el.getFirstChild() instanceof PhpTypedElement)) {
 				return null;
 			}
-			componentName = ElementValueResolver.resolve(index.getValue());
+			componentName = ElementValueResolver.resolveWithoutIndex(index.getValue());
 			type = ((PhpTypedElement) el.getFirstChild()).getType();
 		} else if (el instanceof MethodReference) {
 			MethodReference methodRef = (MethodReference) el;
@@ -58,9 +58,12 @@ public class ComponentTypeProvider implements PhpTypeProvider2 {
 					|| methodRef.getParameters().length != 1) {
 				return null;
 			}
-			componentName = ElementValueResolver.resolve(methodRef.getParameters()[0]);
+			componentName = ElementValueResolver.resolveWithoutIndex(methodRef.getParameters()[0]);
 			type = methodRef.getClassReference().getType();
 		} else {
+			return null;
+		}
+		if (componentName == null) {
 			return null;
 		}
 

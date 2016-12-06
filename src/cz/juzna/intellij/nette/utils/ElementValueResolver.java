@@ -11,9 +11,16 @@ public class ElementValueResolver {
 
 	private PsiElement element;
 
+	private boolean indexAccessAllowed = true;
+
 	public ElementValueResolver(PsiElement element) {
 		super();
 		this.element = element;
+	}
+
+	public void disallowIndexAccess()
+	{
+		indexAccessAllowed = false;
 	}
 
 	@Nullable
@@ -29,6 +36,13 @@ public class ElementValueResolver {
 		return (new ElementValueResolver(element)).resolve();
 	}
 
+	public static String resolveWithoutIndex(PsiElement element)
+	{
+		ElementValueResolver resolver = new ElementValueResolver(element);
+		resolver.disallowIndexAccess();
+
+		return resolver.resolve();
+	}
 
 	private String doResolve(PsiElement element) throws UnresolvableValueException {
 		if (element instanceof StringLiteralExpression) {
@@ -38,26 +52,39 @@ public class ElementValueResolver {
 
 			return doResolve(binaryExpression.getLeftOperand()) + doResolve(binaryExpression.getRightOperand());
 		} else if (element instanceof ClassConstantReference) {
-			ClassConstantReference constantReference = (ClassConstantReference) element;
-			ClassReference classReference = (ClassReference) constantReference.getClassReference();
-			if (classReference != null && constantReference.getLastChild() instanceof LeafPsiElement) {
-				String constantName = constantReference.getLastChild().getText();
-				if (constantName.equals("class")) {
-					return classReference.getFQN();
-				}
-				for (PhpClass phpClass : PhpIndexUtil.getClasses(classReference, classReference.getProject())) {
-					Field constant = phpClass.findFieldByName(constantName, true);
-					if (constant != null && constant.isConstant()) {
-						try {
-							return doResolve(constant.getDefaultValue());
-						} catch (UnresolvableValueException e) {
-						}
-					}
-				}
+			String result = tryResolveClassConstant((ClassConstantReference) element);
+			if (result != null) {
+				return result;
 			}
 		}
 		throw new UnresolvableValueException();
 
+	}
+
+	private String tryResolveClassConstant(ClassConstantReference constantReference)
+	{
+		ClassReference classReference = (ClassReference) constantReference.getClassReference();
+		if (classReference == null || !(constantReference.getLastChild() instanceof LeafPsiElement)) {
+			return null;
+		}
+		String constantName = constantReference.getLastChild().getText();
+		if (constantName.equals("class")) {
+			return classReference.getFQN();
+		}
+		if (!indexAccessAllowed) {
+			return null;
+		}
+		for (PhpClass phpClass : PhpIndexUtil.getClasses(classReference, classReference.getProject())) {
+			Field constant = phpClass.findFieldByName(constantName, true);
+			if (constant == null || !constant.isConstant()) {
+				continue;
+			}
+			try {
+				return doResolve(constant.getDefaultValue());
+			} catch (UnresolvableValueException e) {
+			}
+		}
+		return null;
 	}
 
 	private class UnresolvableValueException extends Exception {
