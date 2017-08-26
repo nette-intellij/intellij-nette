@@ -61,8 +61,6 @@
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Nette -->
-		<php.typeProvider2 implementation="cz.juzna.intellij.nette.typeProvider.NetteObjectFieldsTypeProvider"/>
-		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.CompilerExtensionCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.PhpDocCompletionContributor"/>

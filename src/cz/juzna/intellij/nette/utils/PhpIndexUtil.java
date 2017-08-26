@@ -38,9 +38,6 @@ public class PhpIndexUtil {
 		return getByType(types.toArray(new String[types.size()]), phpIndex, visited);
 	}
 
-	public static Collection<PhpClass> getByType(String[] types, PhpIndex phpIndex) {
-		return getByType(types, phpIndex, new HashSet<String>());
-	}
 
 	public static Collection<PhpClass> getByType(String[] types, PhpIndex phpIndex, Set<String> visited) {
 		Collection<PhpClass> classes = new ArrayList<PhpClass>();
