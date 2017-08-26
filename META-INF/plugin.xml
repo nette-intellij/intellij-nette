@@ -56,10 +56,12 @@
 	<depends>com.intellij.modules.lang</depends>
 	<depends>com.jetbrains.php</depends>
 
+	<extensions defaultExtensionNs="com.jetbrains.php">
+		<typeProvider3 implementation="cz.juzna.intellij.nette.typeProvider.ComponentTypeProvider"/>
+	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Nette -->
 		<php.typeProvider2 implementation="cz.juzna.intellij.nette.typeProvider.NetteObjectFieldsTypeProvider"/>
-		<php.typeProvider2 implementation="cz.juzna.intellij.nette.typeProvider.ComponentTypeProvider"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.NetteObjectFieldsCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
 		<completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.CompilerExtensionCompletionContributor"/>
