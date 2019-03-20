@@ -7,7 +7,7 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocMethod;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.yourkit.util.Strings;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -156,8 +156,7 @@ public class ListenerGeneratorUtil {
 				return null;
 			}
 			parts[0] = aliases.get(parts[0]);
-
-			return Strings.join("", parts, "\\", false);
+			return StringUtils.join(parts,"\\");
 		}
 	}
 
