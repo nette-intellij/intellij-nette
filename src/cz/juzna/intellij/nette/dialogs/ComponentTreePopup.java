@@ -11,10 +11,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.tree.TreeUtil;
 import com.jetbrains.php.lang.psi.elements.Method;
 import com.jetbrains.php.lang.psi.elements.PhpClass;
 import cz.juzna.intellij.nette.utils.ComponentSearcher;
@@ -49,7 +47,7 @@ public class ComponentTreePopup {
 		structureView.setAutoscrolls(false);
 
 		MnemonicHelper.init(structureView);
-		final JBPopup popup = JBPopupFactory.getInstance().createComponentPopupBuilder(structureView, (JComponent) null)
+		final JBPopup popup = JBPopupFactory.getInstance().createComponentPopupBuilder(structureView, null)
 				.setTitle("Component tree")
 				.setResizable(true)
 				.setModalContext(false)
@@ -74,7 +72,8 @@ public class ComponentTreePopup {
 			public void run() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						structureView.getTreeBuilder().queueUpdate().doWhenDone(new Runnable() {
+						//todo :resolve next commented lines - need it?
+						/*structureView.getTreeBuilder().queueUpdate().doWhenDone(new Runnable() {
 							public void run() {
 								SwingUtilities.invokeLater(new Runnable() {
 									public void run() {
@@ -88,7 +87,7 @@ public class ComponentTreePopup {
 									}
 								});
 							}
-						});
+						});*/
 					}
 				});
 			}

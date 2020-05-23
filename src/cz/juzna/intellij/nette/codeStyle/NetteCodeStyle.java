@@ -33,7 +33,7 @@ public class NetteCodeStyle extends PhpLanguageCodeStyleSettingsProvider.PSR1PSR
 		phpSettings.LOWER_CASE_NULL_CONST = false;
 		phpSettings.UPPER_CASE_NULL_CONST = true;
 		phpSettings.UPPER_CASE_BOOLEAN_CONST = true;
-		phpSettings.BLANK_LINE_BEFORE_RETURN_STATEMENT = false;
+		phpSettings.BLANK_LINES_BEFORE_RETURN_STATEMENT = 0;
 
 	}
 }
