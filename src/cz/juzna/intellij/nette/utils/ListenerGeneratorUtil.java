@@ -7,7 +7,6 @@ import com.jetbrains.php.lang.PhpLangUtil;
 import com.jetbrains.php.lang.documentation.phpdoc.psi.PhpDocMethod;
 import com.jetbrains.php.lang.psi.elements.*;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.yourkit.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,10 +91,10 @@ public class ListenerGeneratorUtil {
 				return null;
 			}
 			Method docMethod = field.getContainingClass().findMethodByName(field.getName());
-			if (docMethod == null || !(docMethod instanceof PhpDocMethod)) {
+			if (!(docMethod instanceof PhpDocMethod)) {
 				return null;
 			}
-			ArrayList<ParameterInfo> parameters = new ArrayList<ParameterInfo>();
+			ArrayList<ParameterInfo> parameters = new ArrayList<>();
 			int i = 0;
 			for (Parameter parameter : docMethod.getParameters()) {
 				String name = parameter.getName();
@@ -128,7 +127,7 @@ public class ListenerGeneratorUtil {
 			if (start == -1 || end == -1 || start > end) {
 				return null;
 			}
-			List<ParameterInfo> parameters = new ArrayList<ParameterInfo>();
+			List<ParameterInfo> parameters = new ArrayList<>();
 			String parametersStr = description.substring(start + 1, end);
 			int i = 0;
 			for (String param : parametersStr.split(",")) {
@@ -157,7 +156,7 @@ public class ListenerGeneratorUtil {
 			}
 			parts[0] = aliases.get(parts[0]);
 
-			return Strings.join("", parts, "\\", false);
+			return String.join("\\", parts);
 		}
 	}
 

@@ -11,7 +11,7 @@ import com.jetbrains.php.lang.psi.elements.PhpClass;
 import com.jetbrains.php.lang.psi.elements.PhpNamedElement;
 import com.jetbrains.php.lang.psi.elements.PhpTypedElement;
 import com.jetbrains.php.lang.psi.resolve.types.PhpType;
-import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider3;
+import com.jetbrains.php.lang.psi.resolve.types.PhpTypeProvider4;
 import cz.juzna.intellij.nette.utils.ComponentSearcher;
 import cz.juzna.intellij.nette.utils.ElementValueResolver;
 import cz.juzna.intellij.nette.utils.PhpIndexUtil;
@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Set;
 
 
-public class ComponentTypeProvider implements PhpTypeProvider3
+public class ComponentTypeProvider implements PhpTypeProvider4
 {
 
 	private final static String SEPARATOR = "\u0180";
@@ -68,6 +68,11 @@ public class ComponentTypeProvider implements PhpTypeProvider3
 			resultType.add("#" + getKey() + componentName + SEPARATOR + typePart);
 		}
 		return resultType;
+	}
+
+	@Override
+	public @Nullable PhpType complete(String s, Project project) {
+		return null;
 	}
 
 	@Override
