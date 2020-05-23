@@ -63,7 +63,7 @@
 	]]>
   </change-notes>
 
-  <idea-version since-build="171"/>
+  <idea-version since-build="191.8026.42"/>
   <depends>com.intellij.modules.lang</depends>
   <depends>com.jetbrains.php</depends>
 
