@@ -17,7 +17,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 version '0.4.5'
-group 'cz.juzna.intellij.nette'
 
 jar {
     archiveName 'intellij-nette-' + version + '.jar'
@@ -44,7 +43,7 @@ intellij {
             'java',
             'properties'
     ]
-    pluginName 'Nette Framework Helpers'
+    pluginName 'Nette framework helpers'
 }
 
 repositories {

@@ -1,5 +1,5 @@
 <idea-plugin>
-  <name>Nette Framework Helpers</name>
+  <name>Nette framework helpers</name>
   <description>Nette development with pleasure - (annotations, components...)</description>
 
   <vendor>juzna.cz</vendor>
@@ -20,15 +20,15 @@
     <psi.referenceContributor language="PHP" implementation="cz.juzna.intellij.nette.reference.ComponentReferenceContributor"/>
     <referencesSearch implementation="cz.juzna.intellij.nette.reference.ComponentReferenceSearch"/>
 
-    <localInspection language="PHP" shortName="NonPublicInject"  id="NonPublicInject" displayName="Non-public @inject property"
+    <localInspection language="PHP" shortName="NonPublicInject"  id="NetteNonPublicInject" displayName="Non-public @inject property"
                      groupName="Nette"
                      implementationClass="cz.juzna.intellij.nette.inspections.NonPublicInjectInspection"
                      level="ERROR" enabledByDefault="true"/>
-    <localInspection language="PHP" shortName="NonPublicPersistent"  id="NonPublicPersistent" displayName="Non-public @persistent property"
+    <localInspection language="PHP" shortName="NonPublicPersistent"  id="NetteNonPublicPersistent" displayName="Non-public @persistent property"
                      groupName="Nette"
                      implementationClass="cz.juzna.intellij.nette.inspections.NonPublicPersistentInspection"
                      level="ERROR" enabledByDefault="true"/>
-    <localInspection language="PHP" shortName="CreateComponentReturnFormType"  id="CreateComponentReturnFormType" displayName="Form return type of createComponent*"
+    <localInspection language="PHP" shortName="CreateComponentReturnFormType"  id="NetteCreateComponentReturnFormType" displayName="Form return type of createComponent*"
                      groupName="Nette"
                      implementationClass="cz.juzna.intellij.nette.inspections.CreateComponentReturnFormTypeInspection"
                      level="WARNING" enabledByDefault="true"/>
