@@ -1,0 +1,59 @@
+plugins {
+    id 'org.jetbrains.intellij' version "0.6.5"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += ["src/main/gen"]
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+version '0.4.5'
+
+jar {
+    archiveName 'intellij-nette-' + version + '.jar'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+runIde {
+    ideDirectory "${properties.getProperty('runIdeDirectory')}"
+}
+
+def htmlFixer = { htmlFile -> file(htmlFile).text.replace('<html>', '').replace('</html>', '') }
+
+patchPluginXml {
+    changeNotes = htmlFixer('src/main/resources/META-INF/change-notes.html')
+}
+
+apply plugin: 'org.jetbrains.intellij'
+
+intellij {
+    version ideaVersion
+    updateSinceUntilBuild false
+    plugins = [
+            "com.jetbrains.php:${phpPluginVersion}",
+            'java',
+            'properties'
+    ]
+    pluginName 'Nette framework helpers'
+}
+
+repositories {
+    mavenCentral()
+//    flatDir {
+//        dirs 'libs'
+//    }
+}
+
+//dependencies {
+//    compileOnly 'com.mesour.intellij:intellij-utils:1.0.0-SNAPSHOT'
+//    testCompile 'junit:junit:4.13'
+//}

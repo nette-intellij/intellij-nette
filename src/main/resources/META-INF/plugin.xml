@@ -1,0 +1,49 @@
+<idea-plugin>
+  <name>Nette framework helpers</name>
+  <description>Nette development with pleasure - (annotations, components...)</description>
+
+  <vendor>juzna.cz</vendor>
+
+  <idea-version since-build="191.8026.42"/>
+
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.jetbrains.php</depends>
+
+  <extensions defaultExtensionNs="com.jetbrains.php">
+    <typeProvider4 implementation="cz.juzna.intellij.nette.typeProvider.ComponentTypeProvider"/>
+  </extensions>
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Nette -->
+    <completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.ComponentCompletionContributor"/>
+    <completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.CompilerExtensionCompletionContributor"/>
+    <completion.contributor language="PHP" implementationClass="cz.juzna.intellij.nette.completion.PhpDocCompletionContributor"/>
+    <psi.referenceContributor language="PHP" implementation="cz.juzna.intellij.nette.reference.ComponentReferenceContributor"/>
+    <referencesSearch implementation="cz.juzna.intellij.nette.reference.ComponentReferenceSearch"/>
+
+    <localInspection language="PHP" shortName="NonPublicInject"  id="NetteNonPublicInject" displayName="Non-public @inject property"
+                     groupName="Nette"
+                     implementationClass="cz.juzna.intellij.nette.inspections.NonPublicInjectInspection"
+                     level="ERROR" enabledByDefault="true"/>
+    <localInspection language="PHP" shortName="NonPublicPersistent"  id="NetteNonPublicPersistent" displayName="Non-public @persistent property"
+                     groupName="Nette"
+                     implementationClass="cz.juzna.intellij.nette.inspections.NonPublicPersistentInspection"
+                     level="ERROR" enabledByDefault="true"/>
+    <localInspection language="PHP" shortName="CreateComponentReturnFormType"  id="NetteCreateComponentReturnFormType" displayName="Form return type of createComponent*"
+                     groupName="Nette"
+                     implementationClass="cz.juzna.intellij.nette.inspections.CreateComponentReturnFormTypeInspection"
+                     level="WARNING" enabledByDefault="true"/>
+    <predefinedCodeStyle implementation="cz.juzna.intellij.nette.codeStyle.NetteCodeStyle"/>
+    <gotoDeclarationHandler implementation="cz.juzna.intellij.nette.reference.EventInvocationGoToDeclarationHandler"/>
+  </extensions>
+
+  <actions>
+    <group id="ListenerGenerators">
+      <action class="cz.juzna.intellij.nette.actions.GenerateInlineListenerAction" id="GenerateInlineListenerAction2"
+              text="Event Listener"
+              description="Create inline listener."/>
+      <add-to-group group-id="GenerateGroup" anchor="last"/>
+    </group>
+    <action class="cz.juzna.intellij.nette.actions.ViewComponentTreeAction" id="ComponentTreePopup" text="Show Component Tree"
+            description="Shows component tree in presenter or component"/>
+  </actions>
+</idea-plugin>

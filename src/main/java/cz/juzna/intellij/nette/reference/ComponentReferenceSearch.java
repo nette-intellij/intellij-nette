@@ -1,5 +1,6 @@
 package cz.juzna.intellij.nette.reference;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -21,10 +22,14 @@ public class ComponentReferenceSearch extends QueryExecutorBase<PsiReference, Re
 			return;
 		}
 		final Method method = (Method) searchParameters.getElementToSearch();
-		String componentName = ComponentUtil.methodToComponentName(method.getName());
-		if (componentName == null) {
+		String[] componentName = new String[1];
+		ApplicationManager.getApplication().runReadAction(() -> {
+			componentName[0] = ComponentUtil.methodToComponentName(method.getName());
+		});
+		if (componentName[0] == null) {
 			return;
 		}
+
 		PsiSearchHelper.getInstance(method.getProject())
 				.processElementsWithWord((psiElement, i) -> {
 					if (!(psiElement instanceof StringLiteralExpression)) {
@@ -41,6 +46,6 @@ public class ComponentReferenceSearch extends QueryExecutorBase<PsiReference, Re
 					}
 
 					return true;
-				}, searchParameters.getScopeDeterminedByUser(), componentName, UsageSearchContext.IN_STRINGS, true);
+				}, searchParameters.getScopeDeterminedByUser(), componentName[0], UsageSearchContext.IN_STRINGS, true);
 	}
 }

@@ -1,0 +1,63 @@
+<html>
+<h2>0.4.5</h2>
+<ul>
+	<li>Fixed exception in 2020.3 (issue #33, #30)</li>
+	<li>Implemented Gradle (improved development)</li>
+</ul>
+<h2>0.4.4</h2>
+<ul>
+	<li>ComponentTypeProvider: upgrade to PhpTypeProvider4</li>
+	<li>Fixed compatibility with new PhpStorm versions (more deprecated fixed)</li>
+	<li>Temporarily disabled one feature in "component tree popup" (will be fixed in next version)</li>
+</ul>
+<h2>0.4.3</h2>
+<ul>
+	<li>ComponentTypeProvider: upgrade to PhpTypeProvider3</li>
+	<li>Remove Nette object support</li>
+</ul>
+<h2>0.4.2</h2>
+<ul>
+	<li>ComponentTypeProvider: Fixed index access during indexing</li>
+</ul>
+<h2>0.4.1</h2>
+<ul>
+	<li>Fixed RuntimeException Invalid Signature</li>
+	<li>Fixed StackOverflowException</li>
+	<li>Fixed: find magic methods only in the Nette Object</li>
+</ul>
+<h2>0.4.0</h2>
+<ul>
+	<li>Fixed deadlocks</li>
+	<li>Added support for dash separated subcomponents in getComponent or array access + components refactoring</li>
+</ul>
+<h2>0.3.1</h2>
+<ul>
+	<li>Fixed StringIndexOutOfBoundsException exception in ClassFinder</li>
+</ul>
+<h2>0.3.0</h2>
+<ul>
+	<li>Added component tree popup</li>
+	<li>Added inspection that createComponent returns UI\Form</li>
+	<li>Added EventInvocationGoToDeclarationHandler [#15]</li>
+	<li>Added predefined Nette Code style [#20]</li>
+	<li>Added support for @persistent annotation (completion and inspection)</li>
+	<li>Fixed few issues in TypeProviders causing ide freeze</li>
+</ul>
+<h2>0.2.0</h2>
+<ul>
+	<li>Components: created completion contributor for component access using ArrayAccess or getComponent method</li>
+	<li>Components: created reference contributor from ArrayAccess/getComponent access to createComponent* method</li>
+	<li>Components: added references search for "Find usages" action</li>
+	<li>Components: added TypeProvider for components access</li>
+	<li>Components: added refactoring support (rename component access when renaming createComponent* method)</li>
+	<li>@inject annotation completion provider</li>
+	<li>@inject annotation inspection: check if property is public</li>
+	<li>Added listener generator action for nette/object events (experimental)</li>
+	<li>Refactoring, removed deprecated stuffs..</li>
+	<li>Removed Pd\Entity support</li>
+</ul>
+<h2>0.1.0</h2>
+<ul>
+	<li>Initial version</li>
+</ul>
+</html>
