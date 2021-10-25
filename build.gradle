@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.intellij' version "0.6.5"
+    id 'org.jetbrains.intellij' version "0.7.3"
 }
 
 sourceSets {
@@ -16,7 +16,7 @@ properties.load(project.rootProject.file("local.properties").newDataInputStream(
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version '0.4.5'
+version '0.4.6-alpha1'
 
 jar {
     archiveName 'intellij-nette-' + version + '.jar'

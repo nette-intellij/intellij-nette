@@ -1,5 +1,5 @@
 <idea-plugin>
-  <name>Nette framework helpers</name>
+  <name>Nette Framework Helpers</name>
   <description>Nette development with pleasure - (annotations, components...)</description>
 
   <vendor>juzna.cz</vendor>
@@ -10,6 +10,7 @@
   <depends>com.jetbrains.php</depends>
 
   <extensions defaultExtensionNs="com.jetbrains.php">
+    <libraryRoot id="library" path="/library/" runtime="false"/>
     <typeProvider4 implementation="cz.juzna.intellij.nette.typeProvider.ComponentTypeProvider"/>
   </extensions>
   <extensions defaultExtensionNs="com.intellij">
