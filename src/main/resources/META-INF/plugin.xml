@@ -1,5 +1,5 @@
 <idea-plugin>
-  <name>Nette Framework Helpers</name>
+  <name>Nette framework helpers</name>
   <description>Nette development with pleasure - (annotations, components...)</description>
 
   <vendor>juzna.cz</vendor>
